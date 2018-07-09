@@ -42,7 +42,7 @@ class Profile(models.Model):
 class OutOfOffice(models.Model):
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-    number_of_days = models.PositiveIntegerField(null=True, blank=True)
+#    number_of_days = models.PositiveIntegerField(null=True, blank=True)
     person = models.ForeignKey(User, on_delete=models.CASCADE, related_name='out_of_office_person', blank=True, null=True)
     leave_type = models.CharField(choices=LEAVE_TYPE, max_length=200)
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='out_of_office_project', blank=True, null=True)
@@ -54,11 +54,15 @@ class OutOfOffice(models.Model):
         verbose_name = "Out of Office"
 
     def __str__(self):
-        return str(self.start_date)
+        if self.start_date is None:
+            return 0
+        else:
+            return str(self.start_date)
 
     @property
     def number_of_days(self):
         holidays = [date(2018, 8, 6), date(2018, 9, 3), date(2018, 10, 8), date(2018, 12, 25), date(2018, 12, 26)]
-        delta = networkdays(self.start_date, self.end_date + timedelta(days=-1), holidays=holidays)
-
-        return delta
+        if self.start_date is None or self.end_date is None:
+            return 0
+        else:
+            return networkdays(self.start_date, self.end_date + timedelta(days=-1), holidays=holidays)

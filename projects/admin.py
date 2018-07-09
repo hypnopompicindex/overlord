@@ -25,7 +25,7 @@ class PurchaseOrderReceiptInline(admin.TabularInline):
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ['name', 'project_status']
+    list_display = ['job_number_assignment', 'name', 'client', 'project_status', 'event_start_date', 'event_end_date']
     filter_horizontal = ('team_selection',)
     list_filter = ('project_status',)
     readonly_fields = ['total_budget']
