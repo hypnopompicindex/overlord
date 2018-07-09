@@ -74,7 +74,10 @@ class Project(models.Model):
 
     @property
     def total_budget(self):
-        return self.expenses_budget + self.hardware_budget
+        if self.expenses_budget is None or self.hardware_budget is None:
+            return 0
+        else:
+            return self.expenses_budget + self.hardware_budget
 
 
 class Category(models.Model):
@@ -89,8 +92,6 @@ class Expense(models.Model):
     expense_number_assignment = models.PositiveIntegerField(null=True, blank=True)
     processed = models.BooleanField()
     backup = models.FileField(upload_to='expense_backup/%Y/%m/%d', blank=True, null=True)
-#    notes = models.TextField(blank=True)
-#    expense_items = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='project_expense_items', blank=True, null=True)
     cheque_processed = models.BooleanField(default=False)
     date = models.DateField(blank=True, null=True)
     cheque_number = models.PositiveIntegerField(null=True, blank=True)
@@ -160,8 +161,6 @@ class PurchaseOrder(models.Model):
     backup = models.FileField(upload_to='purchase_backup/%Y/%m/%d', blank=True, null=True)
     method_of_payment = models.CharField(choices=PAYMENT_TYPE, max_length=200)
     processed = models.BooleanField()
-#    notes = models.TextField(blank=True)
-#    purchase_order_items = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='project_order_items', blank=True, null=True)
     shipping = models.DecimalField(default=0, null=True, blank=True, decimal_places=2, max_digits=10)
     void = models.BooleanField(default=False)
     cheque_processed = models.BooleanField(default=False)

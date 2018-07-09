@@ -23,7 +23,6 @@ class PurchaseOrderReceiptInline(admin.TabularInline):
     extra = 0
 
 
-
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ['name', 'project_status']
@@ -57,20 +56,12 @@ class ProjectAdmin(admin.ModelAdmin):
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = ['expense_number_assignment', 'person', 'processed', 'backup', ]
-    inlines = [ReceiptInline,]
-
-
-class PurchaseOrderReceiptInline(admin.TabularInline):
-    model = PurchaseOrderReceipt
-    readonly_fields = ['amount']
-    fields = ['row_number', 'description', 'quantity', 'rate', 'hst', 'amount', 'project']
-    extra = 0
+    inlines = [ReceiptInline]
 
 
 class PurchaseOrderSupplierInline(admin.TabularInline):
     model = PurchaseOrder
     fields = ['purchase_order_number', 'requester', 'processed', 'backup', 'date', 'by_whom']
-
     extra = 0
 
 
@@ -87,3 +78,8 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
     list_display = ['purchase_order_number', 'supplier', 'requester', 'processed', 'backup', 'purchase_order_request_date']
     fields = ['requester', 'purchase_order_number', 'purchase_order_request_date', 'supplier', 'supplier_address', 'backup', 'method_of_payment', 'processed', 'shipping', 'void', 'cheque_processed', 'date', 'cheque_number', 'by_whom']
     inlines = [PurchaseOrderReceiptInline]
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['name']
