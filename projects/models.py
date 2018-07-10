@@ -1,7 +1,7 @@
 from django.db import models
 from people.models import Profile
 from phonenumber_field.modelfields import PhoneNumberField
-
+from . import fields
 
 PROJECT_STATUS = (
     ('EPWS', 'EPWS'),
@@ -171,3 +171,6 @@ class PurchaseOrder(models.Model):
     def __str__(self):
         return 'Purchase Order Number {0}'.format(self.purchase_order_number)
 
+
+class TimeSheet(models.Model):
+    dayOfTheWeek = fields.DayOfTheWeekField()
