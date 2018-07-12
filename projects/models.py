@@ -22,7 +22,6 @@ SHOW_TYPE = (
     ('SOFTWARE ONLY RELEASE', 'Software Only Release'),
 )
 
-
 PAYMENT_TYPE = (
     ('WIRE TRANSFER', 'Wire Transfer'),
     ('PAYPAL', 'PayPal'),
@@ -170,7 +169,3 @@ class PurchaseOrder(models.Model):
 
     def __str__(self):
         return 'Purchase Order Number {0}'.format(self.purchase_order_number)
-
-
-class TimeSheet(models.Model):
-    dayOfTheWeek = fields.DayOfTheWeekField()

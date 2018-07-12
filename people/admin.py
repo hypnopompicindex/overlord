@@ -1,7 +1,21 @@
 from django.contrib import admin
-from .models import Profile, OutOfOffice
+from .models import Profile, OutOfOffice, TimeSheet
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
+
+
+@admin.register(TimeSheet)
+class TimeSheetAdmin(admin.ModelAdmin):
+    list_display = ['person', 'project', 'week', 'hours']
+    search_fields = ['person', 'project', 'week', 'monday']
+    readonly_fields = ['hours']
+
+
+class TimeSheetInline(admin.StackedInline):
+    model = TimeSheet
+    extra = 0
+    readonly_fields = ['hours']
+    search_fields = ['project', 'week']
 
 
 class UserProfileInline(admin.StackedInline):
@@ -17,7 +31,7 @@ class OutOfOfficeInline(admin.StackedInline):
 
 
 class UserAdmin(AuthUserAdmin):
-    inlines = [UserProfileInline, OutOfOfficeInline]
+    inlines = [UserProfileInline, OutOfOfficeInline, TimeSheetInline]
 
     fieldsets = (
         ('Personal Info',{

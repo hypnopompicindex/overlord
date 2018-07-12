@@ -1,10 +1,5 @@
 from django.contrib import admin
-from .models import Project, Client, Category, Receipt, Expense, Supplier, PurchaseOrder, PurchaseOrderReceipt, TimeSheet
-
-
-@admin.register(TimeSheet)
-class TimeSheetAdmin(admin.ModelAdmin):
-    pass
+from .models import Project, Client, Category, Receipt, Expense, Supplier, PurchaseOrder, PurchaseOrderReceipt
 
 
 @admin.register(Client)

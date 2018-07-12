@@ -66,3 +66,25 @@ class OutOfOffice(models.Model):
             return 0
         else:
             return networkdays(self.start_date, self.end_date + timedelta(days=-1), holidays=holidays)
+
+
+class TimeSheet(models.Model):
+    person = models.ForeignKey(User, on_delete=models.CASCADE, related_name='timesheet_person', blank=True, null=True)
+    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='timesheet_project', blank=True, null=True)
+    week = models.PositiveIntegerField(null=True, blank=True)
+    monday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    tuesday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    wednesday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    thursday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    friday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    saturday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    sunday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    hours = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
+
+    def __str__(self):
+        return 'Timesheet'
+
+    def save(self, *args, **kwargs):
+        self.hours = float(self.monday) + float(self.tuesday) + float(self.wednesday) + \
+                     float(self.thursday) + float(self.friday) + float(self.saturday) + float(self.sunday)
+        super(TimeSheet, self).save(*args, **kwargs)

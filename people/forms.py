@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Profile
+from .models import Profile, TimeSheet
 
 
 class UserRegistrationForm(forms.ModelForm):
