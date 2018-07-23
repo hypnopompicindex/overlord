@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Timesheet List</h1>
+
+    {% for user in user_list %}
+        <tr>
+            <td><a href="/">{{ timesheet.week }}</a></td>
+            <td>{{ user.first_name }}</td>
+        </tr>
+    {% endfor %}
+
+    {% if timesheet_list %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Week</th>
+                    <th scope="col">Hours</th>
+                    <th scope="col">Project</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for timesheet in timesheet_list %}
+
+                    <tr>
+                        <td><a href="/">{{ timesheet.week }}</a></td>
+                        <td>{{ timesheet.hours }}</td>
+                        <td>{{ timesheet.project }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+      <p>You have no timesheets.</p>
+    {% endif %}
+{% endblock %}

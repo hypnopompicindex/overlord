@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" >
+        <link href="{% static "css/base.css" %}" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+          <div class="content">
+            <div class="row">
+               <div>
+                  <div class="page-header">
+                      <h1>Purchase Order</h1>
+                      <p><a href="#" onclick="window.print();">Print</a></p>
+                        {% block content %}
+                            <dl class="row">
+                              <dt class="col-sm-3 text-right">Requester:</dt>
+                              <dd class="col-sm-9">{{ purchase.requester }}</dd>
+                              <dt class="col-sm-3 text-right">PO Number:</dt>
+                              <dd class="col-sm-9">{{ purchase.purchase_order_number }}</dd>
+                              <dt class="col-sm-3 text-right">Processed:</dt>
+                              <dd class="col-sm-9">{{ purchase.processed }}</dd>
+                              <dt class="col-sm-3 text-right">PO Date:</dt>
+                              <dd class="col-sm-9">{{ purchase.purchase_order_request_date }}</dd>
+                              <dt class="col-sm-3 text-right">Supplier:</dt>
+                              <dd class="col-sm-9">{{ purchase.supplier }}</dd>
+                              <dt class="col-sm-3 text-right"></dt>
+                              <dd class="col-sm-9">{{ purchase.supplier_address }}</dd>
+                            </dl>
+                            <div class="module">
+                              <div class="tabular">
+                                <table class="table table-condensed table-bordered table-striped">
+                                  <thead>
+                                    <tr>
+                                      <th>Receipt Number</th>
+                                      <th>Description</th>
+                                      <th>Category</th>
+                                      <th>Amount</th>
+                                      <th>Project</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {% for item in purchase.purchase_order_receipt.all %}
+                                      <tr class="row{% cycle "1" "2" %}">
+                                        <td class="num">{{ item.row_number }}</td>
+                                        <td class="num">{{ item.description }}</td>
+                                        <td class="num">{{ item.category }}</td>
+                                        <td class="num">${{ item.amount }}</td>
+                                        <td class="num">{{ item.project }}</td>
+                                      </tr>
+                                    {% endfor %}
+                                    <tr class="total">
+                                      <td colspan="3">Total</td>
+                                      <td class="num">$</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                                <table class="table table-condensed table-bordered">
+                                  <tbody>
+                                      <td colspan="4">Employee Signature</td>
+                                      <td colspan="4">Date</td>
+                                      <td colspan="4">GC Approval</td>
+                                      <td colspan="4">Date</td>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                        {% endblock %}
+                  </div>
+               </div>
+            </div>
+          </div>
+        </div>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
