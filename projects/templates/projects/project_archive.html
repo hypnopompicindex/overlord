@@ -1,0 +1,39 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Project Month{% endblock %}
+
+{% block content %}
+
+    <div class="results">
+        <h1>Globacore Pipeline: All Projects
+        </h1>
+        <table id="result_list" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Job #</th>
+                    <th>Name</th>
+                    <th>Client</th>
+                    <th>Total Budget</th>
+                    <th>Project Status</th>
+                    <th>Estimate</th>
+                    <th>Purchase Order</th>
+                    <th>Event Start Date</th>
+                    <th>Event End Date</th>
+                </tr>
+            </thead>
+            {% for project in object_list %}
+                <tr>
+                    <td><a href="/projects/project/{{ project.id }}/change/">{{ project.job_number_assignment }}</a></td>
+                    <td>{{ project.name }}</td>
+                    <td>{{ project.client }}</td>
+                    <td>{{ project.total_budget }}</td>
+                    <td>{{ project.project_status }}</td>
+                    <td>{{ project.estimate }}</td>
+                    <td>{{ project.purchase_order }}</td>
+                    <td>{{ project.event_start_date }}</td>
+                    <td>{{ project.event_end_date }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

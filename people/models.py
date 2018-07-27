@@ -35,7 +35,6 @@ class Profile(models.Model):
     address = models.TextField(blank=True, null=True)
     biography = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
-    avatar = models.ImageField(upload_to='users/%Y/%m/%d', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
@@ -74,7 +73,7 @@ class OutOfOffice(models.Model):
 
 class TimeSheet(models.Model):
     person = models.ForeignKey(User, on_delete=models.CASCADE, related_name='timesheet_person')
-    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='timesheet_project')
+    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='timesheet')
     week = models.DateField(help_text='Must be a Monday', verbose_name='Start of Week', validators=[validate_monday])
     monday = models.CharField(max_length=20, blank=True, null=True, default=0)
     tuesday = models.CharField(max_length=20, blank=True, null=True, default=0)
@@ -95,7 +94,7 @@ class TimeSheet(models.Model):
         return str(self.person)
 
     def get_absolute_url(self):
-        return reverse('timesheet-update', kwargs={'pk': self.pk})
+        return reverse('user-update', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
         self.hours = float(self.monday) + float(self.tuesday) + float(self.wednesday) + \

@@ -29,7 +29,7 @@ class TimeSheetAdmin(admin.ModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'project':
-            kwargs["queryset"] = Project.objects.filter(timesheets_closed=False)
+            kwargs["queryset"] = Project.objects.filter(timesheets_closed=False, team_selection__exact=request.user.id)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_form(self, request, obj=None, **kwargs):
@@ -82,7 +82,7 @@ admin.site.register(User, UserAdmin)
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'date_of_birth', 'avatar']
+    list_display = ['user', 'date_of_birth']
 
 
 @admin.register(OutOfOffice)

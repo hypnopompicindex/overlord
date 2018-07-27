@@ -9,11 +9,9 @@
 
     <div class="col-md-4">
         <form action="" method="post">{% csrf_token %}
-
             <table class="table">
-                {{ timesheets.management_form }}
 
-                {% for timesheet in timesheets.forms %}
+                {% for timesheet in form %}
                     {% if forloop.first %}
                         <thead>
                         <tr>
@@ -23,6 +21,7 @@
                         </tr>
                         </thead>
                     {% endif %}
+                {% endfor %}
                     <tr class="{% cycle row1 row2 %} formset_row">
                         {% for field in form.visible_fields %}
                             <td>
@@ -37,7 +36,7 @@
                             </td>
                         {% endfor %}
                     </tr>
-                {% endfor %}
+
             </table>
             <input type="submit" value="Save"/> <a href="{% url 'user-list' %}">back to the list</a>
         </form>
@@ -48,7 +47,8 @@
         <link href="{% static "css/base.css" %}" rel="stylesheet">
 
 
-
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="{% static 'formset/jquery.formset.js' %}"></script>
     <script type="text/javascript">
         $('.formset_row').formset({
@@ -57,8 +57,11 @@
             prefix: 'timesheet_person'
         });
     </script>
+    <script src="{% static 'js/weekPicker.js' %}"></script>
 
-
+    <script>
+        convertToWeekPicker($("#id_week"))
+    </script>
 
 
 

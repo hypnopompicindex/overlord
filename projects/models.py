@@ -1,18 +1,9 @@
 from django.db import models
 from people.models import Profile
+from django.urls import reverse
 from phonenumber_field.modelfields import PhoneNumberField
 from . import fields
 
-PROJECT_STATUS = (
-    ('EPWS', 'EPWS'),
-    ('PROPOSAL', 'Proposal'),
-    ('BID', 'Bid'),
-    ('BOOKED', 'Booked'),
-    ('INTERNAL', 'Internal'),
-    ('SUPPORT', 'Support'),
-    ('CLOSED', 'Closed'),
-    ('LOST', 'Lost'),
-)
 
 SHOW_TYPE = (
     ('TRADESHOW', 'Tradeshow'),
@@ -53,9 +44,19 @@ class TravelDates(models.Model):
 
 
 class Project(models.Model):
+    PROJECT_STATUS = (
+        ('BOOKED', 'Booked'),
+        ('BID', 'Bid'),
+        ('PROPOSAL', 'Proposal'),
+        ('EPWS', 'EPWS'),
+        ('CLOSED', 'Closed'),
+        ('LOST', 'Lost'),
+        ('INTERNAL', 'Internal'),
+        ('SUPPORT', 'Support'),
+    )
     name = models.CharField(max_length=200, blank=True, null=True)
     project_status = models.CharField(choices=PROJECT_STATUS, max_length=200)
-    job_number_assignment = models.PositiveIntegerField(null=True, blank=True)
+    job_number_assignment = models.PositiveIntegerField(null=True, blank=True, verbose_name='Job #')
     product_owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='product_owner', blank=True, null=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client', blank=True, null=True)
     production_date = models.DateField(blank=True, null=True)

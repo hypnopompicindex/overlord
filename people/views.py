@@ -4,11 +4,19 @@ from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
 from django.urls import reverse_lazy
-from .forms import UserRegistrationForm, UserEditForm, ProfileEditForm, TimeSheetFormSet
+from .forms import UserRegistrationForm, UserEditForm, ProfileEditForm, TimeSheetFormSet, TimeSheetForm
 from .models import Profile, TimeSheet
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.db import transaction
+
+
+class RequestFormKwargsMixin(object):
+    def get_form_kwargs(self):
+        kwargs = super(RequestFormKwargsMixin, self).get_form_kwargs()
+        # Update the existing form kwargs dict with the request's user.
+        kwargs.update({"request": self.request})
+        return kwargs
 
 
 class UserList(ListView):
@@ -85,9 +93,9 @@ class TimeSheetListView(ListView):
         return TimeSheet.objects.filter(person=self.request.user)
 
 
-class TimeSheetCreate(CreateView):
+class TimeSheetCreate(RequestFormKwargsMixin, CreateView):
     model = TimeSheet
-    fields = '__all__'
+    form_class = TimeSheetForm
 
     def form_valid(self, form):
         timesheet = form.save(commit=False)
@@ -96,9 +104,10 @@ class TimeSheetCreate(CreateView):
         return HttpResponseRedirect('http://127.0.0.1:8000/account/timesheet/')
 
 
-class TimeSheetUpdate(UpdateView):
+class TimeSheetUpdate(RequestFormKwargsMixin, UpdateView):
     model = TimeSheet
     fields = '__all__'
+    form_class = TimeSheetForm
 
 
 @login_required
