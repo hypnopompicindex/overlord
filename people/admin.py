@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, OutOfOffice, TimeSheet
+from .models import Profile, OutOfOffice, TimeSheet, TimeSheetWeek, Hours
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from projects.models import Project
@@ -107,3 +107,29 @@ class OutOfOfficeAdmin(admin.ModelAdmin):
         else:
             qs = super(OutOfOfficeAdmin, self).get_queryset(request)
             return qs.filter(person=request.user)
+
+
+class HoursInline(admin.TabularInline):
+    model = Hours
+    extra = 0
+    readonly_fields = ['hours']
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'project':
+            kwargs["queryset"] = Project.objects.filter(timesheets_closed=False, team_selection__exact=request.user.id)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+@admin.register(TimeSheetWeek)
+class TimeSheetWeekAdmin(admin.ModelAdmin):
+    readonly_fields = ['end_of_week']
+    list_display = ['week', 'end_of_week', 'person', 'approved', 'changes_required']
+    search_fields = ['week', 'end_of_week', 'person']
+    list_filter = ['person', 'week', 'approved']
+    inlines = [HoursInline]
+    fields = ['person', 'week', 'end_of_week', 'approved', 'changes_required']
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'person':
+            kwargs["queryset"] = User.objects.filter(username=request.user.username)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)

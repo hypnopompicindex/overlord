@@ -108,3 +108,66 @@ class TimeSheet(models.Model):
             return ' '
         else:
             return self.week + timedelta(days=6)
+
+
+class TimeSheetWeek(models.Model):
+    person = models.ForeignKey(User, on_delete=models.CASCADE, related_name='timesheetweek_person')
+    week = models.DateField(help_text='Must be a Monday', verbose_name='Start of Week', validators=[validate_monday])
+    approved = models.BooleanField(default=False)
+    changes_required = models.TextField(max_length=20, blank=True, null=True)
+
+    class Meta:
+        unique_together = ('person', 'week')
+        ordering = ('-week',)
+        verbose_name = 'Timesheet'
+        verbose_name_plural = 'Timesheets'
+
+    def __str__(self):
+        return 'Timesheet for {}, the week of {} to {}'.format(self.person, self.start_of_week, self.end_of_week)
+
+    @property
+    def start_of_week(self):
+        if self.week is None:
+            return ' '
+        else:
+            dt = self.week
+            return dt.strftime("%b. %-d, %Y")
+
+    @property
+    def end_of_week(self):
+        if self.week is None:
+            return ' '
+        else:
+            dt = self.week + timedelta(days=6)
+            return dt.strftime("%b. %-d, %Y")
+
+
+class Hours(models.Model):
+    time_sheet_week = models.ForeignKey(TimeSheetWeek, on_delete=models.CASCADE, related_name='time_sheet_weeks')
+    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='timesheet2')
+    monday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    tuesday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    wednesday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    thursday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    friday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    saturday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    sunday = models.CharField(max_length=20, blank=True, null=True, default=0)
+    hours = models.DecimalField('Total Hours', null=True, blank=True, decimal_places=2, max_digits=10)
+
+    class Meta:
+        ordering = ('project',)
+        verbose_name = 'Hours'
+        verbose_name_plural = 'Hours'
+
+    def __str__(self):
+        return 'Timesheet on {} for the {} project'.format(self.time_sheet_week, self.project)
+
+    def save(self, *args, **kwargs):
+        self.hours = float(self.monday) + float(self.tuesday) + float(self.wednesday) + \
+                     float(self.thursday) + float(self.friday) + float(self.saturday) \
+                     + float(self.sunday)
+        super(Hours, self).save(*args, **kwargs)
+
+    @property
+    def total_hours(self):
+        return ",".join([str(p) for p in self.trim_set.all()])

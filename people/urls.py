@@ -1,5 +1,7 @@
 from django.urls import path, re_path
 from django.contrib.auth.views import *
+from .views import TimeSheetArchiveIndexView, TimeSheetWeekArchiveView, \
+    TimeSheetWeekArchiveIndexView, TimeSheetWeekWeekArchiveView
 from . import views
 
 
@@ -25,10 +27,18 @@ urlpatterns = [
          password_reset_confirm, name='password_reset_confirm'),
     path('password-reset/complete/', password_reset_complete, name='password_reset_complete'),
     path('timesheet/create/', views.TimeSheetCreate.as_view(), name='people_create'),
-    path('timesheet/<pk>/', views.TimeSheetUpdate.as_view(), name='timesheet-update'),
     path('timesheet/', views.TimeSheetListView.as_view(), name='timesheets'),
     path('user/', views.UserList.as_view(), name='user-list'),
     path('user/add/', views.UserTimeSheetCreate.as_view(), name='user-add'),
     path('user/<pk>/', views.UserTimeSheetUpdate.as_view(), name='user-update'),
     path('user/<pk>/delete/', views.UserDelete.as_view(), name='user-delete'),
+    path('timesheet/all/', TimeSheetArchiveIndexView.as_view(), name="timesheets-all"),
+    path('timesheet/<int:year>/week/<int:week>/',
+         TimeSheetWeekArchiveView.as_view(),
+         name="timesheet-week"),
+    path('timesheet2/all/', TimeSheetWeekArchiveIndexView.as_view(), name="timesheets-all"),
+    path('timesheet2/<int:year>/week/<int:week>/',
+         TimeSheetWeekWeekArchiveView.as_view(),
+         name="timesheet-week"),
+    path('timesheet2/create/', views.HoursCreate.as_view(), name='people_create'),
 ]

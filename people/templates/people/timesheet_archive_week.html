@@ -1,0 +1,74 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Timesheets - Weekly{% endblock %}
+
+{% block content %}
+    <div class="results">
+        <h1>Globacore Timesheets
+        </h1>
+        <table>
+            <tr>
+                <th>Previous week</th>
+                <th>Current week</th>
+                <th>Next week</th>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/account/timesheet/{{ previous_week|date:"Y"  }}/week/{{ previous_week|date:"W" }}/">
+                         {{ previous_week|date:"F j, Y" }}
+                    </a>
+                </td>
+                <td>
+                    <a href="/account/timesheet/{{ week|date:"Y"  }}/week/{{ week|date:"W" }}/">
+                         {{ week|date:"F j, Y" }}
+                    </a>
+                </td>
+                <td>
+                    <a href="/account/timesheet/{{ next_week|date:"Y"  }}/week/{{ next_week|date:"W" }}/">
+                        {{ next_week|date:"F j, Y" }}
+                    </a>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table id="result_list" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Person</th>
+                    <th>Project</th>
+                    <th>Start of Week</th>
+                    <th>End of Week</th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                    <th>Saturday</th>
+                    <th>Sunday</th>
+                    <th>Hours</th>
+                    <th>Approved</th>
+                    <th>Changes Required</th>
+                </tr>
+            </thead>
+            {% for timesheet in object_list %}
+                <tr>
+                    <td>{{ timesheet.person }}</td>
+                    <td>{{ timesheet.project }}</td>
+                    <td>{{ timesheet.week }}</td>
+                    <td>{{ timesheet.monday }}</td>
+                    <td>{{ timesheet.tuesday }}</td>
+                    <td>{{ timesheet.wednesday }}</td>
+                    <td>{{ timesheet.thursday }}</td>
+                    <td>{{ timesheet.friday }}</td>
+                    <td>{{ timesheet.saturday }}</td>
+                    <td>{{ timesheet.sunday }}</td>
+                    <td>{{ timesheet.hours }}</td>
+                    <td>{{ timesheet.approved }}</td>
+                    <td>{{ timesheet.changes_required }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+
+    </div>
+{% endblock %}

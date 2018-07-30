@@ -1,7 +1,7 @@
 from django.forms import Form
 from django import forms
 from django.contrib.auth.models import User
-from .models import Profile, TimeSheet
+from .models import Profile, TimeSheet, Hours, TimeSheetWeek
 from django.forms import ModelForm
 from django.forms import inlineformset_factory
 from isoweek import Week
@@ -81,3 +81,31 @@ class ProfileEditForm(ModelForm):
     class Meta:
         model = Profile
         fields = ('initials', 'mobile_phone', 'office_phone', 'date_of_birth', 'address', 'biography', 'notes')
+
+
+class HoursForm(RequestKwargModelFormMixin, ModelForm):
+    class Meta:
+        model = Hours
+        fields = ['project', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday',
+                  'saturday', 'sunday']
+        labels = {
+            "monday": "Mon %s" % (w[0].strftime('%d %b'),),
+            "tuesday": "Tue %s" % (w[1].strftime('%d %b'),),
+            "wednesday": "Wed %s" % (w[2].strftime('%d %b'),),
+            "thursday": "Thu %s" % (w[3].strftime('%d %b'),),
+            "friday": "Fri %s" % (w[4].strftime('%d %b'),),
+            "saturday": "Sat %s" % (w[5].strftime('%d %b'),),
+            "sunday": "Sun %s" % (w[6].strftime('%d %b'),),
+        }
+        widgets = {
+            'week': forms.DateInput(attrs={'class':'weekPicker'}),
+        }
+
+    def __init__(self, request, *args, **kwargs):
+        super(TimeSheet2Form, self).__init__(*args, **kwargs)
+        self.fields['project'].queryset = Project.objects.\
+            filter(timesheets_closed=False).\
+            filter(team_selection__exact=request.user.id)
+
+
+HoursFormSet = inlineformset_factory(TimeSheetWeek, Hours, form=HoursForm, extra=1)

@@ -4,11 +4,12 @@ from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
 from django.urls import reverse_lazy
-from .forms import UserRegistrationForm, UserEditForm, ProfileEditForm, TimeSheetFormSet, TimeSheetForm
-from .models import Profile, TimeSheet
+from .forms import UserRegistrationForm, UserEditForm, ProfileEditForm, TimeSheetFormSet, TimeSheetForm, HoursForm
+from .models import Profile, TimeSheet, TimeSheetWeek, Hours
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.db import transaction
+from django.views.generic.dates import ArchiveIndexView, WeekArchiveView
 
 
 class RequestFormKwargsMixin(object):
@@ -155,3 +156,54 @@ def edit(request):
         profile_form = ProfileEditForm(instance=request.user.profile)
     return render(request, 'people/edit.html', {'user_form': user_form,
                                                  'profile_form': profile_form})
+
+
+class TimeSheetArchiveIndexView(ArchiveIndexView):
+    queryset = TimeSheet.objects.all()
+    date_field = "week"
+    allow_future = True
+    ordering = ['week']
+    date_list_period = 'month'
+
+
+class TimeSheetWeekArchiveView(WeekArchiveView):
+    queryset = TimeSheet.objects.all()
+    date_field = "week"
+    allow_future = True
+    week_format = "%W"
+    allow_empty = True
+    ordering = ['week']
+
+
+class TimeSheetWeekArchiveIndexView(ArchiveIndexView):
+    queryset = TimeSheetWeek.objects.all()
+    date_field = "week"
+    allow_future = True
+    ordering = ['week']
+    date_list_period = 'month'
+
+
+class TimeSheetWeekWeekArchiveView(WeekArchiveView):
+    queryset = TimeSheetWeek.objects.all()
+    date_field = "week"
+    allow_future = True
+    week_format = "%W"
+    allow_empty = True
+    ordering = ['week']
+
+
+class HoursCreate(RequestFormKwargsMixin, CreateView):
+    model = Hours
+    form_class = HoursForm
+
+    def form_valid(self, form):
+        timesheet = form.save(commit=False)
+        timesheet.person = User.objects.get(username=self.request.user)
+        timesheet.save()
+        return HttpResponseRedirect('http://127.0.0.1:8000/account/timesheet/')
+
+
+class HoursUpdate(RequestFormKwargsMixin, UpdateView):
+    model = Hours
+    fields = '__all__'
+    form_class = HoursForm

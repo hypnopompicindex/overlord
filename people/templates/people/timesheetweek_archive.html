@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Timesheets{% endblock %}
+
+{% block content %}
+    <div class="results">
+        <h1>Globacore Timesheets
+        </h1>
+        <table id="result_list" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Person</th>
+                    <th>Week Starting</th>
+                </tr>
+            </thead>
+    {% for timesheet in object_list %}
+        <tr>
+            <td>{{ timesheet.person }}</td>
+            <td>{{ timesheet.week }}</td>
+        </tr>
+    {% endfor %}
+        </table>
+    </div>
+{% endblock %}
