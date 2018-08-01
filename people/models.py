@@ -32,7 +32,10 @@ class Profile(models.Model):
     mobile_phone = models.CharField(max_length=20, blank=True, null=True)
     office_phone = models.CharField(max_length=20, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
+    date_of_hire = models.DateField(blank=True, null=True)
+    date_of_termination = models.DateField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
+    emergency_contacts = models.TextField(blank=True, null=True)
     biography = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
 

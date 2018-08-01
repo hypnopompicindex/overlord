@@ -3,6 +3,8 @@ from people.models import Profile
 from django.urls import reverse
 from phonenumber_field.modelfields import PhoneNumberField
 from . import fields
+from datetime import datetime
+from django.contrib.auth.models import User
 
 
 SHOW_TYPE = (
@@ -54,25 +56,30 @@ class Project(models.Model):
         ('INTERNAL', 'Internal'),
         ('SUPPORT', 'Support'),
     )
+    id = models.AutoField(primary_key=True, verbose_name='Job #')
     name = models.CharField(max_length=200, blank=True, null=True)
     project_status = models.CharField(choices=PROJECT_STATUS, max_length=200)
-    job_number_assignment = models.PositiveIntegerField(null=True, blank=True, verbose_name='Job #')
+#    job_number_assignment = models.PositiveIntegerField(null=True, blank=True, verbose_name='Job #')
     product_owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='product_owner', blank=True, null=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client', blank=True, null=True)
-    production_date = models.DateField(blank=True, null=True)
+    go_live_date = models.DateField(blank=True, null=True)
     event_start_date = models.DateField(blank=True, null=True)
-    event_end_date = models.DateField(blank=True, null=True)
+    billing_date = models.DateField(blank=True, null=True)
+    permanent_installation = models.BooleanField(default=False)
     team_selection = models.ManyToManyField(Profile)
     billable = models.BooleanField()
     estimate = models.BooleanField()
     production_budget = models.DecimalField(decimal_places=2, max_digits=10, default=0)
     expenses_budget = models.DecimalField(decimal_places=2, max_digits=10, default=0)
-    hardware_budget = models.DecimalField(decimal_places=2, max_digits=10, default=0)
+    hardware_purchase = models.DecimalField(decimal_places=2, max_digits=10, default=0)
+    hardware_rental = models.DecimalField(decimal_places=2, max_digits=10, default=0)
     testing = models.DateField(blank=True, null=True)
     ship = models.DateField(blank=True, null=True)
     event_load_in = models.DateField(blank=True, null=True)
     dismantle = models.DateField(blank=True, null=True)
-    purchase_order = models.ForeignKey('PurchaseOrder', on_delete=models.CASCADE, related_name='project_purchase_order', blank=True, null=True)
+    purchase_order = models.ManyToManyField('PurchaseOrder',
+                                            related_name='project_purchase_order',
+                                            blank=True)
     labour = models.DecimalField('Labour (Internal)', null=True, blank=True, decimal_places=2, max_digits=10)
     travel_dates = models.ManyToManyField(TravelDates, related_name='travel_dates_project', blank=True)
     timesheets_closed = models.BooleanField(default=False)
@@ -84,25 +91,31 @@ class Project(models.Model):
 
     @property
     def total_budget(self):
-        return self.expenses_budget + self.hardware_budget + self.production_budget
+        return self.production_budget + self.expenses_budget + self.hardware_purchase + self.hardware_rental
 
 
 class Category(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Categories"
+        verbose_name = "Category"
 
     def __str__(self):
         return self.name
 
 
 class Expense(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='expense number')
     person = models.ForeignKey('people.Profile', on_delete=models.CASCADE, related_name='person_expense', blank=True, null=True)
     expense_number_assignment = models.PositiveIntegerField(null=True, blank=True)
-    processed = models.BooleanField()
+    cheque_processed = models.BooleanField()
     backup = models.FileField(upload_to='expense_backup/%Y/%m/%d', blank=True, null=True)
-    cheque_processed = models.BooleanField(default=False)
-    date = models.DateField(blank=True, null=True)
-    cheque_number = models.PositiveIntegerField(null=True, blank=True)
-    by_whom = models.ForeignKey('people.Profile', on_delete=models.CASCADE, related_name='by_whom_expense', blank=True, null=True)
+    date = models.DateTimeField(blank=True, null=True)
+#    date = models.DateField(blank=True, null=True)
+    cheque_number = models.CharField(max_length=20, blank=True, null=True)
+    reference_number = models.CharField(max_length=20, blank=True, null=True)
+    by_whom = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.expense_number_assignment)

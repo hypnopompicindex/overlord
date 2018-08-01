@@ -61,7 +61,7 @@ class OutOfOfficeInline(admin.StackedInline):
 
 
 class UserAdmin(AuthUserAdmin):
-    inlines = [UserProfileInline, OutOfOfficeInline, TimeSheetInline]
+    inlines = [UserProfileInline]
     list_display = ['username', 'first_name', 'last_name', 'email', 'is_active', 'is_staff', 'is_superuser']
 
     fieldsets = (

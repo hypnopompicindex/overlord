@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Project, Client, Category, Receipt, Expense, Supplier, PurchaseOrder, PurchaseOrderReceipt, TravelDates
 from django.utils.safestring import mark_safe
+from datetime import datetime
 
 
 def print_expense(obj):
@@ -55,9 +56,10 @@ class PurchaseOrderReceiptInline(admin.TabularInline):
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ['job_number_assignment', 'name', 'client', 'total_budget', 'project_status', 'estimate', 'purchase_order', 'event_start_date', 'event_end_date']
+    list_display = ['id', 'name', 'client', 'total_budget', 'project_status',
+                    'estimate', 'event_start_date', 'billing_date']
     filter_horizontal = ('team_selection',)
-    list_filter = ('project_status', 'timesheets_closed', 'event_end_date')
+    list_filter = ('project_status', 'timesheets_closed', 'billing_date')
     search_fields = ['name', 'product_owner', 'client']
     readonly_fields = ['total_budget']
     inlines = [ReceiptInline, PurchaseOrderReceiptInline]
@@ -66,13 +68,15 @@ class ProjectAdmin(admin.ModelAdmin):
             'fields': ('name', 'project_status', 'product_owner', 'client')
         }),
         ('EPWS',{
-            'fields': ('job_number_assignment', 'event_start_date', 'event_end_date', 'team_selection', 'billable')
+            'fields': ('event_start_date', 'billing_date', 'permanent_installation',
+                       'team_selection', 'billable')
         }),
         ('Proposal', {
-            'fields': ('estimate', 'production_budget', 'expenses_budget', 'hardware_budget', 'total_budget')
+            'fields': ('estimate', 'production_budget', 'expenses_budget',
+                       'hardware_purchase', 'hardware_rental', 'total_budget')
         }),
         ('Bid', {
-            'fields': ('testing', 'ship', 'event_load_in', 'production_date', 'dismantle')
+            'fields': ('testing', 'ship', 'event_load_in', 'go_live_date', 'dismantle')
         }),
         ('Booked', {
             'fields': ('purchase_order', 'labour', 'travel_dates')
@@ -86,21 +90,34 @@ class ProjectAdmin(admin.ModelAdmin):
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
-    list_display = ['expense_number_assignment', 'person', 'processed', 'backup', print_expense, expense_pdf]
+    list_display = ['id', 'person', 'cheque_processed', 'backup', print_expense, expense_pdf]
     inlines = [ReceiptInline]
-    list_filter = ['person', 'processed', 'cheque_processed']
+    list_filter = ['person', 'cheque_processed', 'date']
     search_fields = ['person']
-    fields = ['person', 'expense_number_assignment', 'processed', 'backup',
-              'cheque_processed', 'date', 'cheque_number', 'by_whom']
+    readonly_fields = ['id', 'date', 'by_whom']
+    fields = ['id', 'person', 'expense_number_assignment',
+              'backup', 'cheque_number', 'reference_number',
+              'cheque_processed', 'date', 'by_whom']
 
     def get_form(self, request, obj=None, **kwargs):
         if request.user.is_superuser:
-            self.fields = ['person', 'expense_number_assignment', 'processed', 'backup',
-              'cheque_processed', 'date', 'cheque_number', 'by_whom', ]
+            self.fields = ['id', 'person', 'expense_number_assignment',
+                           'backup', 'cheque_number', 'reference_number', 'cheque_processed',
+                           'date', 'by_whom']
         else:
-            self.fields = ['person', 'expense_number_assignment', 'processed', 'backup']
+            self.fields = ['id', 'person', 'expense_number_assignment',
+                           'backup', 'cheque_number', 'reference_number', 'cheque_processed',
+                           'date', 'by_whom']
         form = super(ExpenseAdmin,self).get_form(request, obj, **kwargs)
         return form
+
+    def save_model(self, request, obj, form, change):
+
+        if obj.processed and 'cheque_processed' in form.changed_data:
+            obj.date = datetime.now()
+            if getattr(obj, 'by_whom', None) is None:
+                obj.by_whom = request.user
+        obj.save()
 
 
 class PurchaseOrderSupplierInline(admin.TabularInline):
