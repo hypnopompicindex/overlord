@@ -34,10 +34,14 @@ purchase_pdf.short_description = 'PDF'
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ['name', 'sub_customer_of', 'address', 'contact_name', 'contact_email']
+    list_display = ['name', 'address', 'contact_name', 'contact_email', 'taylor_client', 'projects']
     ordering = ['name']
-    search_fields = ['name', 'sub_customer_of', 'contact_name', 'contact_email']
-    list_filter = ['sub_customer_of']
+#    readonly_fields = ['projects']
+    search_fields = ['name', 'contact_name', 'contact_email']
+    list_filter = ['taylor_client']
+
+    def projects(self, obj):
+        return ", ".join([k.name for k in obj.client.all()])
 
 
 class ReceiptInline(admin.TabularInline):
@@ -61,30 +65,26 @@ class ProjectAdmin(admin.ModelAdmin):
     filter_horizontal = ('team_selection',)
     list_filter = ('project_status', 'timesheets_closed', 'billing_date')
     search_fields = ['name', 'product_owner', 'client']
-    readonly_fields = ['total_budget']
+    readonly_fields = ['total_budget', 'id']
     inlines = [ReceiptInline, PurchaseOrderReceiptInline]
     fieldsets = (
-        ('General',{
-            'fields': ('name', 'project_status', 'product_owner', 'client')
+        ('Project Information', {
+            'fields': ('name', 'id', 'client', 'project_status', 'product_owner',
+                       'timesheets_closed', 'falls_into_project_year', 'archive_by_year')
         }),
-        ('EPWS',{
+        ('Financials', {
+            'fields': ('billable', 'production_budget', 'expenses_budget',
+                       'hardware_purchase', 'hardware_rental', 'total_budget',
+                       'purchase_order', 'estimate', 'estimate_back_up', 'labour')
+        }),
+        ('Key Dates', {
             'fields': ('event_start_date', 'billing_date', 'permanent_installation',
-                       'team_selection', 'billable')
+                       'testing', 'ship', 'event_load_in', 'go_live_date', 'dismantle',
+                       'travel_dates')
         }),
-        ('Proposal', {
-            'fields': ('estimate', 'production_budget', 'expenses_budget',
-                       'hardware_purchase', 'hardware_rental', 'total_budget')
+        ('Team Members', {
+            'fields': ('team_selection',)
         }),
-        ('Bid', {
-            'fields': ('testing', 'ship', 'event_load_in', 'go_live_date', 'dismantle')
-        }),
-        ('Booked', {
-            'fields': ('purchase_order', 'labour', 'travel_dates')
-        }),
-        ('Closed', {
-            'fields': ('timesheets_closed', 'falls_into_project_year', 'archive_by_year')
-        }),
-
     )
 
 

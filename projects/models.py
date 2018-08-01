@@ -26,11 +26,11 @@ PAYMENT_TYPE = (
 
 class Client(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
-    sub_customer_of = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, related_name='sub_customer_of_client')
     address = models.TextField(max_length=200, blank=True, null=True)
     contact_name = models.CharField(max_length=200, blank=True, null=True)
     contact_email = models.EmailField(max_length=200, blank=True, null=True)
     contact_phone = models.CharField(max_length=200, blank=True, null=True)
+    taylor_client = models.BooleanField(default=False)
     notes = models.TextField(max_length=200, blank=True, null=True)
     archive = models.BooleanField(default=False)
 
@@ -77,9 +77,11 @@ class Project(models.Model):
     ship = models.DateField(blank=True, null=True)
     event_load_in = models.DateField(blank=True, null=True)
     dismantle = models.DateField(blank=True, null=True)
-    purchase_order = models.ManyToManyField('PurchaseOrder',
-                                            related_name='project_purchase_order',
-                                            blank=True)
+#    purchase_order = models.ManyToManyField('PurchaseOrder',
+#                                            related_name='project_purchase_order',
+#                                            blank=True)
+    purchase_order = models.FileField(upload_to='project/purchase_order/%Y/%m/%d', blank=True, null=True)
+    estimate_back_up = models.FileField(upload_to='expense_backup/%Y/%m/%d', blank=True, null=True)
     labour = models.DecimalField('Labour (Internal)', null=True, blank=True, decimal_places=2, max_digits=10)
     travel_dates = models.ManyToManyField(TravelDates, related_name='travel_dates_project', blank=True)
     timesheets_closed = models.BooleanField(default=False)
