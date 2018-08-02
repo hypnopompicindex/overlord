@@ -55,9 +55,9 @@ class ProjectBookedListView(ListView):
 
 class ProjectMonthArchiveView(MonthArchiveView):
     queryset = Project.objects.exclude(project_status='Closed')
-    date_field = "event_end_date"
+    date_field = "billing_date"
     allow_future = True
-    ordering = ['event_end_date']
+    ordering = ['billing_date']
     allow_empty = True
 
     def get_month(self):
@@ -79,7 +79,7 @@ class ProjectMonthArchiveView(MonthArchiveView):
 
 class ProjectArchiveIndexView(ArchiveIndexView):
     queryset = Project.objects.exclude(project_status='Closed')
-    date_field = "event_end_date"
+    date_field = "billing_date"
     allow_future = True
-    ordering = ['event_end_date']
+    ordering = ['billing_date']
     date_list_period = 'month'

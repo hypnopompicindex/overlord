@@ -5,6 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from . import fields
 from datetime import datetime
 from django.contrib.auth.models import User
+from django.utils.safestring import mark_safe
 
 
 SHOW_TYPE = (
@@ -95,6 +96,15 @@ class Project(models.Model):
     def total_budget(self):
         return self.production_budget + self.expenses_budget + self.hardware_purchase + self.hardware_rental
 
+    @property
+    def Purchase_order(self):
+        if self.purchase_order:
+            return mark_safe('<a href="/media/%s" target="_blank">'
+                             '<img src="/static/admin/img/icon-yes.svg" alt="True" /></a>'
+                             % self.purchase_order)
+        else:
+            return mark_safe('<img src="/static/admin/img/icon-no.svg" alt="True" />')
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
@@ -181,8 +191,9 @@ class Supplier(models.Model):
 
 
 class PurchaseOrder(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='Purchase Order Number')
     requester = models.ForeignKey('people.Profile', on_delete=models.CASCADE, related_name='person_requester', blank=True, null=True)
-    purchase_order_number = models.PositiveIntegerField(null=True, blank=True)
+#    purchase_order_number = models.PositiveIntegerField(null=True, blank=True)
     purchase_order_request_date = models.DateField(blank=True, null=True)
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='purchase_order_supplier', blank=True, null=True)
     supplier_address = models.TextField(blank=True)
@@ -192,12 +203,12 @@ class PurchaseOrder(models.Model):
     shipping = models.DecimalField(default=0, null=True, blank=True, decimal_places=2, max_digits=10)
     void = models.BooleanField(default=False)
     cheque_processed = models.BooleanField(default=False)
-    date = models.DateField(blank=True, null=True)
+    date = models.DateTimeField(blank=True, null=True)
     cheque_number = models.PositiveIntegerField(null=True, blank=True)
-    by_whom = models.ForeignKey('people.Profile', on_delete=models.CASCADE, related_name='by_whom_purchase_order', blank=True, null=True)
+    by_whom = models.ForeignKey(User, on_delete=models.CASCADE, related_name='by_whom_purchase_order', blank=True, null=True)
 
     def __str__(self):
-        return 'Purchase Order Number {0}'.format(self.purchase_order_number)
+        return 'Purchase Order Number {0}'.format(self.id)
 
     def get_total_cost(self):
         return sum(item.amount() for item in self.purchase_order_receipt.all())

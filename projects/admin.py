@@ -61,11 +61,11 @@ class PurchaseOrderReceiptInline(admin.TabularInline):
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'client', 'total_budget', 'project_status',
-                    'estimate', 'event_start_date', 'billing_date']
+                    'estimate', 'Purchase_order', 'event_start_date', 'billing_date']
     filter_horizontal = ('team_selection',)
     list_filter = ('project_status', 'timesheets_closed', 'billing_date')
     search_fields = ['name', 'product_owner', 'client']
-    readonly_fields = ['total_budget', 'id']
+    readonly_fields = ['total_budget', 'id', 'Purchase_order']
     inlines = [ReceiptInline, PurchaseOrderReceiptInline]
     fieldsets = (
         ('Project Information', {
@@ -112,8 +112,7 @@ class ExpenseAdmin(admin.ModelAdmin):
         return form
 
     def save_model(self, request, obj, form, change):
-
-        if obj.processed and 'cheque_processed' in form.changed_data:
+        if obj.cheque_processed and 'cheque_processed' in form.changed_data:
             obj.date = datetime.now()
             if getattr(obj, 'by_whom', None) is None:
                 obj.by_whom = request.user
@@ -136,26 +135,37 @@ class SupplierAdmin(admin.ModelAdmin):
 
 @admin.register(PurchaseOrder)
 class PurchaseOrderAdmin(admin.ModelAdmin):
-    list_display = ['purchase_order_number', 'supplier', 'requester', 'processed', 'backup',
+    list_display = ['id', 'supplier', 'requester', 'backup',
                     'purchase_order_request_date', print_purchase, purchase_pdf]
-    fields = ['requester', 'purchase_order_number', 'purchase_order_request_date',
-              'supplier', 'supplier_address', 'backup', 'method_of_payment', 'processed',
-              'shipping', 'void', 'cheque_processed', 'date', 'cheque_number', 'by_whom']
+    fields = ['requester', 'id',
+              'purchase_order_request_date', 'supplier', 'supplier_address',
+              'backup', 'method_of_payment', 'shipping', 'void',
+              'cheque_number', 'cheque_processed', 'date', 'by_whom']
     inlines = [PurchaseOrderReceiptInline]
     list_filter = ['requester', 'supplier', 'processed']
     search_fields = ['requester', 'supplier', ]
+    readonly_fields = ['id', 'date', 'by_whom']
 
     def get_form(self, request, obj=None, **kwargs):
         if request.user.is_superuser:
-            self.fields = ['requester', 'purchase_order_number', 'purchase_order_request_date',
-              'supplier', 'supplier_address', 'backup', 'method_of_payment', 'processed',
-              'shipping', 'void', 'cheque_processed', 'date', 'cheque_number', 'by_whom']
+            self.fields = ['id', 'requester',
+                           'purchase_order_request_date', 'supplier', 'supplier_address',
+                           'backup', 'method_of_payment', 'shipping', 'void',
+                           'cheque_number', 'cheque_processed', 'date', 'by_whom']
         else:
-            self.fields = ['requester', 'purchase_order_number', 'purchase_order_request_date',
-              'supplier', 'supplier_address', 'backup', 'method_of_payment', 'processed',
-              'shipping', 'void']
+            self.fields = ['requester', 'id',
+                           'purchase_order_request_date', 'supplier', 'supplier_address',
+                           'backup', 'method_of_payment', 'shipping', 'void',
+                           'cheque_number', 'cheque_processed', 'date', 'by_whom']
         form = super(PurchaseOrderAdmin,self).get_form(request, obj, **kwargs)
         return form
+
+    def save_model(self, request, obj, form, change):
+        if obj.cheque_processed and 'cheque_processed' in form.changed_data:
+            obj.date = datetime.now()
+            if getattr(obj, 'by_whom', None) is None:
+                obj.by_whom = request.user
+        obj.save()
 
 
 @admin.register(Category)
