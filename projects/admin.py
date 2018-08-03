@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 def print_expense(obj):
-    return mark_safe('<a href="/project/admin/expense/%s">View</a>' % obj.id)
+    return mark_safe('<a href="/project/admin/expense/%s" target="_blank">View</a>' % obj.id)
 
 
 print_expense.short_description = 'Print'
@@ -53,8 +53,8 @@ class ReceiptInline(admin.TabularInline):
 
 class PurchaseOrderReceiptInline(admin.TabularInline):
     model = PurchaseOrderReceipt
-    readonly_fields = ['amount']
-    fields = ['row_number', 'description', 'quantity', 'rate', 'hst', 'amount', 'project']
+    readonly_fields = ['amount', 'id']
+    fields = ['id', 'description', 'quantity', 'rate', 'hst', 'amount', 'project']
     extra = 0
 
 
@@ -90,12 +90,12 @@ class ProjectAdmin(admin.ModelAdmin):
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
-    list_display = ['id', 'person', 'cheque_processed', 'backup', print_expense, expense_pdf]
+    list_display = ['id', 'person', 'cheque_processed', 'backup', print_expense]
     inlines = [ReceiptInline]
     list_filter = ['person', 'cheque_processed', 'date']
     search_fields = ['person']
     readonly_fields = ['id', 'date', 'by_whom']
-    fields = ['id', 'person', 'expense_number_assignment',
+    fields = ['id', 'person',
               'backup', 'cheque_number', 'reference_number',
               'cheque_processed', 'date', 'by_whom']
 
@@ -138,8 +138,8 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'supplier', 'requester', 'backup',
                     'purchase_order_request_date', print_purchase, purchase_pdf]
     fields = ['requester', 'id',
-              'purchase_order_request_date', 'supplier', 'supplier_address',
-              'backup', 'method_of_payment', 'shipping', 'void',
+              'purchase_order_request_date', 'supplier',
+              'backup', 'method_of_payment', 'shipping',
               'cheque_number', 'cheque_processed', 'date', 'by_whom']
     inlines = [PurchaseOrderReceiptInline]
     list_filter = ['requester', 'supplier', 'processed']
@@ -149,13 +149,13 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         if request.user.is_superuser:
             self.fields = ['id', 'requester',
-                           'purchase_order_request_date', 'supplier', 'supplier_address',
-                           'backup', 'method_of_payment', 'shipping', 'void',
+                           'purchase_order_request_date', 'supplier',
+                           'backup', 'method_of_payment', 'shipping',
                            'cheque_number', 'cheque_processed', 'date', 'by_whom']
         else:
             self.fields = ['requester', 'id',
-                           'purchase_order_request_date', 'supplier', 'supplier_address',
-                           'backup', 'method_of_payment', 'shipping', 'void',
+                           'purchase_order_request_date', 'supplier',
+                           'backup', 'method_of_payment', 'shipping',
                            'cheque_number', 'cheque_processed', 'date', 'by_whom']
         form = super(PurchaseOrderAdmin,self).get_form(request, obj, **kwargs)
         return form

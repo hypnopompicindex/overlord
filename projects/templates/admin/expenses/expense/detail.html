@@ -2,79 +2,106 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <title>Title</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" >
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Overlord</title>
+        <meta name = "viewport" content="width=device-width, initial-scale=1.0">
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+        <![endif]-->
+
         <link href="{% static "css/base.css" %}" rel="stylesheet">
     </head>
     <body>
         <div class="container">
-          <div class="content">
-            <div class="row">
-               <div>
-                  <div class="page-header">
-                      <h1>Expense</h1>
-                      <p><a href="#" onclick="window.print();">Print</a></p>
-                        {% block content %}
-                            <dl class="row">
-                              <dt class="col-sm-3 text-right">Person:</dt>
-                              <dd class="col-sm-9">{{ expense.person }}</dd>
-                              <dt class="col-sm-3 text-right">Expense Number:</dt>
-                              <dd class="col-sm-9">{{ expense.expense_number_assignment }}</dd>
-                              <dt class="col-sm-3 text-right">Processed:</dt>
-                              <dd class="col-sm-9">{{ expense.processed }}</dd>
-                              <dt class="col-sm-3 text-right">Date:</dt>
-                              <dd class="col-sm-9">{{ expense.date }}</dd>
-                              <dt class="col-sm-3 text-right">Cheque Number:</dt>
-                              <dd class="col-sm-9">{{ expense.cheque_number }}</dd>
-                            </dl>
-                            <div class="module">
-                              <div class="tabular">
-                                <table class="table table-condensed table-bordered table-striped">
-                                  <thead>
-                                    <tr>
-                                      <th>Receipt Number</th>
-                                      <th>Description</th>
-                                      <th>Category</th>
-                                      <th>Net</th>
-                                      <th>HST</th>
-                                      <th>Amount CAD</th>
-                                      <th>Project</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {% for item in expense.expense_receipt.all %}
-                                      <tr class="row{% cycle "1" "2" %}">
-                                        <td>{{ item.receipt_number }}</td>
-                                        <td class="num">${{ item.description }}</td>
-                                        <td class="num">${{ item.category }}</td>
-                                        <td class="num">{{ item.net }}</td>
-                                        <td class="num">${{ item.hst }}</td>
-                                        <td class="num">${{ item.total }}</td>
-                                        <td class="num">${{ item.project }}</td>
-                                      </tr>
-                                    {% endfor %}
-                                    <tr class="total">
-                                      <td colspan="5">Total</td>
-                                      <td class="num">${{ expense.get_total_cost }}</td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                                <table class="table table-condensed table-bordered">
-                                  <tbody>
-                                      <td colspan="4">Employee Signature</td>
-                                      <td colspan="4">Date</td>
-                                      <td colspan="4">GC Approval</td>
-                                      <td colspan="4">Date</td>
-                                  </tbody>
-                                </table>
-                              </div>
+            <div class="content">
+                <style>
+                    td {font-size:80%;}
+                    th {font-size:80%;}
+                    h3 {font-size:90%;}
+                </style>
+                <table class = "table">
+                    <tr>
+                        <td>
+                            <h4 class="text-left">
+                                <img alt="Globacore-logo-2012-50x222" src=" http://overlord.globacore.com/assets/globacore-logo-2012-50x222-dd6d222de7e2d28ea653a01df7ce4898.jpg"/>
+                            </h4>
+                            <address>
+                                <small>
+                                    &nbsp;&nbsp;90 Fraser Ave<br />
+                                    &nbsp;&nbsp;Toronto,ON, M6K3E1<br />
+                                    &nbsp;&nbsp;+1 416 925-2082</small>
+                            </address>
+                        </td>
+                        <td>
+                            <br />
+                            <h4 class="text-right">
+                                <strong>Expense Report</strong>
+                            </h4>
+                            <div  class="text-right">
+                                <strong><small>Expense Number:</small></strong>
+                                <small>{{ expense.id }}</small><br />
+                                <strong><small>Person:</small></strong>
+                                <small>{{ expense.person }}<br /></small>
+                                <strong><small>Date:</small></strong>
+                                <small>{{ expense.date|date:"M j, Y" }}</small><br />
                             </div>
-                        {% endblock %}
-                  </div>
-               </div>
+                        </td>
+                    </tr>
+                </table>
+                {% block content %}
+                    <table class="table table-condensed table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>HST</th>
+                                <th>FX</th>
+                                <th>CAD</th>
+                                <th>Project</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in expense.expense_receipt.all %}
+                                <tr class="row{% cycle "1" "2" %}">
+                                    <td>{{ item.receipt_number }}</td>
+                                    <td class="num">{{ item.description }}</td>
+                                    <td class="num">{{ item.category }}</td>
+                                    <td class="num" style="text-align:right">${{ item.net }}</td>
+                                    <td class="num" style="text-align:right">{{ item.hst }}</td>
+                                    <td class="num" style="text-align:right">1.0</td>
+                                    <td class="num" style="text-align:right">${{ item.total }}</td>
+                                    <td class="num">{{ item.project }}</td>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="4" style="text-align: right"><small><strong>HST</strong></small></td>
+                                <td style="text-align: right"><small><strong>$0.00</strong></small></td>
+                                <td style="text-align: right"><small><strong>Total</strong></small></td>
+                                <td style="text-align: right"><small><strong>${{ expense.get_total_cost }}</strong></small></td>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class = "table table-bordered">
+                        <tr>
+                            <td><br/><br/></td>
+                            <td><br/><br/></td>
+                            <td><br/><br/></td>
+                            <td><br/><br/></td>
+                        </tr>
+                        <tr>
+                            <td><small>Employee Signature</small></td>
+                            <td><small>Date</small></td>
+                            <td><small>GC Approval</small></td>
+                            <td><small>Date</small></td>
+                        </tr>
+                    </table>
+                {% endblock %}
             </div>
-          </div>
         </div>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.bundle.min.js"></script>
     </body>

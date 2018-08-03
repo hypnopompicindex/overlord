@@ -161,6 +161,7 @@ class Receipt(models.Model):
 
 
 class PurchaseOrderReceipt(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='Receipt #')
     purchase_order = models.ForeignKey('PurchaseOrder', on_delete=models.CASCADE, related_name='purchase_order_receipt', blank=True, null=True)
     row_number = models.PositiveIntegerField(null=True, blank=True)
     description = models.CharField(max_length=200, blank=True, null=True)
@@ -196,12 +197,12 @@ class PurchaseOrder(models.Model):
 #    purchase_order_number = models.PositiveIntegerField(null=True, blank=True)
     purchase_order_request_date = models.DateField(blank=True, null=True)
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='purchase_order_supplier', blank=True, null=True)
-    supplier_address = models.TextField(blank=True)
+#    supplier_address = models.TextField(blank=True)
     backup = models.FileField(upload_to='purchase_backup/%Y/%m/%d', blank=True, null=True)
     method_of_payment = models.CharField(choices=PAYMENT_TYPE, max_length=200)
     processed = models.BooleanField()
     shipping = models.DecimalField(default=0, null=True, blank=True, decimal_places=2, max_digits=10)
-    void = models.BooleanField(default=False)
+#    void = models.BooleanField(default=False)
     cheque_processed = models.BooleanField(default=False)
     date = models.DateTimeField(blank=True, null=True)
     cheque_number = models.PositiveIntegerField(null=True, blank=True)
