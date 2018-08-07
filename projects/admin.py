@@ -26,7 +26,7 @@ expense_pdf.short_description = 'PDF'
 
 
 def purchase_pdf(obj):
-    return mark_safe('<a href="/project/admin/purchase/%s/pdf">PDF</a>' % obj.id)
+    return mark_safe('<a href="/project/admin/purchase/%s/pdf" target="_blank">PDF</a>' % obj.id)
 
 
 purchase_pdf.short_description = 'PDF'
@@ -121,7 +121,7 @@ class ExpenseAdmin(admin.ModelAdmin):
 
 class PurchaseOrderSupplierInline(admin.TabularInline):
     model = PurchaseOrder
-    fields = ['purchase_order_number', 'requester', 'processed', 'backup', 'date', 'by_whom']
+    fields = ['id', 'requester', 'processed', 'backup', 'date', 'by_whom']
     extra = 0
 
 
@@ -136,7 +136,7 @@ class SupplierAdmin(admin.ModelAdmin):
 @admin.register(PurchaseOrder)
 class PurchaseOrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'supplier', 'requester', 'backup',
-                    'purchase_order_request_date', print_purchase, purchase_pdf]
+                    'purchase_order_request_date', print_purchase]
     fields = ['requester', 'id',
               'purchase_order_request_date', 'supplier',
               'backup', 'method_of_payment', 'shipping',

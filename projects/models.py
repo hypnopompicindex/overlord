@@ -6,6 +6,7 @@ from . import fields
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
+from ckeditor.fields import RichTextField
 
 
 SHOW_TYPE = (
@@ -180,7 +181,7 @@ class PurchaseOrderReceipt(models.Model):
 
 class Supplier(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
-    address = models.TextField(max_length=200, blank=True, null=True)
+    address = RichTextField(config_name='awesome_ckeditor', default='')
     contact_name = models.CharField(max_length=200, blank=True, null=True)
     contact_email = models.EmailField(max_length=200, blank=True, null=True)
     contact_phone = models.CharField(max_length=200, blank=True, null=True)

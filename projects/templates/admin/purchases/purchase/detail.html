@@ -2,77 +2,138 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <title>Title</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" >
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Overlord</title>
+        <meta name = "viewport" content="width=device-width, initial-scale=1.0">
         <link href="{% static "css/base.css" %}" rel="stylesheet">
     </head>
     <body>
         <div class="container">
-          <div class="content">
-            <div class="row">
-               <div>
-                  <div class="page-header">
-                      <h1>Purchase Order</h1>
-                      <p><a href="#" onclick="window.print();">Print</a></p>
-                        {% block content %}
-                            <dl class="row">
-                              <dt class="col-sm-3 text-right">Requester:</dt>
-                              <dd class="col-sm-9">{{ purchase.requester }}</dd>
-                              <dt class="col-sm-3 text-right">PO Number:</dt>
-                              <dd class="col-sm-9">{{ purchase.purchase_order_number }}</dd>
-                              <dt class="col-sm-3 text-right">Processed:</dt>
-                              <dd class="col-sm-9">{{ purchase.processed }}</dd>
-                              <dt class="col-sm-3 text-right">PO Date:</dt>
-                              <dd class="col-sm-9">{{ purchase.purchase_order_request_date }}</dd>
-                              <dt class="col-sm-3 text-right">Supplier:</dt>
-                              <dd class="col-sm-9">{{ purchase.supplier }}</dd>
-                              <dt class="col-sm-3 text-right"></dt>
-                              <dd class="col-sm-9">{{ purchase.supplier_address }}</dd>
-                            </dl>
-                            <div class="module">
-                              <div class="tabular">
-                                <table class="table table-condensed table-bordered table-striped">
-                                  <thead>
-                                    <tr>
-                                      <th>Receipt Number</th>
-                                      <th>Description</th>
-                                      <th>Category</th>
-                                      <th>Amount</th>
-                                      <th>Project</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {% for item in purchase.purchase_order_receipt.all %}
-                                      <tr class="row{% cycle "1" "2" %}">
-                                        <td class="num">{{ item.row_number }}</td>
-                                        <td class="num">{{ item.description }}</td>
-                                        <td class="num">{{ item.category }}</td>
-                                        <td class="num">${{ item.amount }}</td>
-                                        <td class="num">{{ item.project }}</td>
-                                      </tr>
-                                    {% endfor %}
-                                    <tr class="total">
-                                      <td colspan="3">Total</td>
-                                      <td class="num">$</td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                                <table class="table table-condensed table-bordered">
-                                  <tbody>
-                                      <td colspan="4">Employee Signature</td>
-                                      <td colspan="4">Date</td>
-                                      <td colspan="4">GC Approval</td>
-                                      <td colspan="4">Date</td>
-                                  </tbody>
-                                </table>
-                              </div>
+            <div class="content">
+                <style>
+                    td {font-size:80%;}
+                    th {font-size:80%;}
+                    h3 {font-size:90%;}
+                </style>
+                <table class = "table">
+                    <tr>
+                        <td>
+                            <h4 class="text-left">
+                                <img alt="Globacore-logo-2012-50x222" src=" http://overlord.globacore.com/assets/globacore-logo-2012-50x222-dd6d222de7e2d28ea653a01df7ce4898.jpg"/>
+                            </h4>
+                            <address>
+                                <small>
+                                    &nbsp;&nbsp;90 Fraser Ave<br />
+                                    &nbsp;&nbsp;Toronto,ON, M6K3E1<br />
+                                    &nbsp;&nbsp;+1 416 925-2082</small>
+                            </address>
+                            <address>
+                                <strong>
+                                <small>	To:</small></strong> <small><br/></small>
+                                    <strong><small>{{ purchase.supplier }}</small></strong> <br/>
+                                    <strong><small>{{ purchase.purchase_order_supplier.all }}</small></strong>
+                                    {% with purchase.supplier as item %}
+                                      {{ item.address|safe }}
+                                    {% endwith %}
+                            </address>
+                        </td>
+                        <td>
+                            <br />
+                            <h4 class="text-right">
+                                <strong>Purchase order</strong>
+                            </h4>
+                            <div  class="text-right">
+                                <strong><small>PO Number:</small></strong>
+                                <small>{{ purchase.id }}</small><br />
+                                <strong><small>PO Date:</small></strong>
+                                <small>{{ purchase.date|date:"M j, Y" }}</small><br />
+                                <strong><small>Requester:</small></strong>
+                                <small>{{ purchase.requester }}</small>
                             </div>
-                        {% endblock %}
-                  </div>
-               </div>
+                        </td>
+                    </tr>
+                </table>
+                {% block content %}
+                    <div class="module">
+                        <div class="tabular">
+                            <table class = "table table-condensed table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Description</td>
+                                        <th class="text-right"><small>Unit cost</small></td>
+                                        <th class="text-right"><small>Quantity</small></td>
+                                        <th class="text-right"><small>Line Total</small></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in purchase.purchase_order_receipt.all %}
+                                        <tr class = "item">
+                                            <td>
+                                                <small>{{ item.description }}</small>
+                                            </td>
+                                            <td style="text-align: right">
+                                                <span class = "text-right"><small>{{ item.rate }}</small></span>
+                                            </td>
+                                            <td style="text-align: right">
+                                                <small>{{ item.quantity }}</small>
+                                            </td>
+                                            <td  style="text-align: right">
+                                                <small>{{ item.amount }}</small>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td style="text-align: right"><strong><small>Total</small><strong></td>
+                                        <td style="text-align: right"><strong><small>$</small></strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class = "table table-bordered ">
+                                <tr>
+                                    <td><small>Notes</small></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <small>
+                                            {% with purchase.supplier as item %}
+                                              {{ item.notes }}
+                                            {% endwith %}
+                                        </small>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class = "table table-bordered ">
+                                <tr>
+                                    <td  width = "60%" rowspan = "5">
+                                        <small><strong>HST Reg No: 85451 9709</strong></small><br /><br />
+                                        <small style = "font-size:10px"><strong>Terms</strong> <br/>
+                                            1. Acknowledge receipt of this order confirming prices and delivery date.<br/>
+                                            2. No substitution or changes will be made unless authorized by us<br/>
+                                            3. We reserve the right to cancel this order if shipment is not made in quantities and at prices and delivery as shown<br/>
+                                            4. Sales tax license numbers are applicable when shown</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><br /><br /></td>
+                                </tr>
+                                <tr>
+                                    <td><small>Supplier Authorized Signature</small></td>
+                                </tr>
+                                <tr>
+                                    <td><br /><br /></td>
+                                </tr>
+                                <tr>
+                                    <td><small>Globacore Authorized Signature</small></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                {% endblock %}
             </div>
-          </div>
         </div>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.bundle.min.js"></script>
     </body>
