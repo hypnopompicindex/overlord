@@ -1,0 +1,55 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Project Month{% endblock %}
+
+{% block content %}
+
+    <div class="results">
+        <h1>Globacore WIP {{ month|date:"F Y"  }}
+        </h1>
+        <table id="result_list" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Month Hours</th>
+                    <th>Month Cost</th>
+                    <th>Total Hours</th>
+                    <th>Total Cost</th>
+                </tr>
+            </thead>
+            {% for project in object_list %}
+                <tr>
+                    <td><a href="/projects/project/{{ project.id }}/change/">{{ project.name }}</a></td>
+                    {% for item in project.timesheet2.all %}
+                        <td></td>
+                        <td></td>
+                        <td>{{ item.hours }}</td>
+                        <td>{{ item.total_cost }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+        <p>
+        <br>
+            {% if previous_month %}Previous Month:
+                <a href="/project/wip/{{ previous_month|date:"Y"  }}/{{ previous_month|date:"b" }}/">
+                    {{ previous_month|date:"F Y" }}
+                </a>
+            {% endif %}
+            <br>
+            {% if next_month %}Next Month:
+                <a href="/project/wip/{{ next_month|date:"Y"  }}/{{ next_month|date:"b" }}/">
+                    {{ next_month|date:"F Y" }}
+                </a>
+            {% endif %}
+        </p>
+
+
+    </div>
+
+
+
+
+
+
+{% endblock %}

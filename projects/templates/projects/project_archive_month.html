@@ -23,7 +23,7 @@
             </thead>
             {% for project in object_list %}
                 <tr>
-                    <td><a href="/projects/project/{{ project.id }}/change/">{{ project.job_number_assignment }}</a></td>
+                    <td><a href="/projects/project/{{ project.id }}/change/">{{ project.id }}</a></td>
                     <td>{{ project.name }}</td>
                     <td>{{ project.client }}</td>
                     <td>{{ project.total_budget }}</td>

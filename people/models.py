@@ -53,6 +53,7 @@ class OutOfOffice(models.Model):
     notes = models.TextField(blank=True, null=True)
     approved = models.BooleanField(default=False)
     time_approved = models.DateTimeField(blank=True, null=True)
+    by_whom = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = "Out of Office"
@@ -116,8 +117,10 @@ class TimeSheet(models.Model):
 class TimeSheetWeek(models.Model):
     person = models.ForeignKey(User, on_delete=models.CASCADE, related_name='timesheetweek_person')
     week = models.DateField(help_text='Must be a Monday', verbose_name='Start of Week', validators=[validate_monday])
-    approved = models.BooleanField(default=False)
     changes_required = models.TextField(max_length=20, blank=True, null=True)
+    approved = models.BooleanField(default=False)
+    time_approved = models.DateTimeField(blank=True, null=True)
+    by_whom = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('person', 'week')
@@ -174,3 +177,8 @@ class Hours(models.Model):
     @property
     def total_hours(self):
         return ",".join([str(p) for p in self.trim_set.all()])
+
+    @property
+    def total_cost(self):
+        return self.hours * 40
+

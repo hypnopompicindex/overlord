@@ -3,6 +3,7 @@ from .models import Profile, OutOfOffice, TimeSheet, TimeSheetWeek, Hours
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from projects.models import Project
+from datetime import datetime
 
 
 @admin.register(TimeSheet)
@@ -87,15 +88,15 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(OutOfOffice)
 class OutOfOfficeAdmin(admin.ModelAdmin):
-    readonly_fields = ['number_of_days']
+    readonly_fields = ['number_of_days', 'time_approved', 'by_whom']
     list_display = ['person', 'start_date', 'end_date', 'number_of_days',  'leave_type', 'project', 'approved']
-    fields = ['start_date', 'end_date', 'number_of_days', 'person', 'leave_type', 'project', 'notes', 'approved', 'time_approved']
+    fields = ['start_date', 'end_date', 'number_of_days', 'person', 'leave_type', 'project', 'notes', 'approved', 'time_approved', 'by_whom']
     list_filter = ('person', 'start_date', 'leave_type', 'project')
     search_fields = ['person', 'project']
 
     def get_form(self, request, obj=None, **kwargs):
         if request.user.is_superuser:
-            self.fields = ['start_date', 'end_date', 'number_of_days', 'person', 'leave_type', 'project', 'notes', 'approved', 'time_approved']
+            self.fields = ['start_date', 'end_date', 'number_of_days', 'person', 'leave_type', 'project', 'notes', 'approved', 'time_approved', 'by_whom']
         else:
             self.fields = ['start_date', 'end_date', 'number_of_days', 'person', 'leave_type', 'project', 'notes']
         form = super(OutOfOfficeAdmin,self).get_form(request, obj, **kwargs)
@@ -107,6 +108,13 @@ class OutOfOfficeAdmin(admin.ModelAdmin):
         else:
             qs = super(OutOfOfficeAdmin, self).get_queryset(request)
             return qs.filter(person=request.user)
+
+    def save_model(self, request, obj, form, change):
+        if obj.approved and 'approved' in form.changed_data:
+            obj.time_approved = datetime.now()
+            if getattr(obj, 'by_whom', None) is None:
+                obj.by_whom = request.user
+        obj.save()
 
 
 class HoursInline(admin.TabularInline):
@@ -122,7 +130,7 @@ class HoursInline(admin.TabularInline):
 
 @admin.register(TimeSheetWeek)
 class TimeSheetWeekAdmin(admin.ModelAdmin):
-    readonly_fields = ['end_of_week']
+    readonly_fields = ['end_of_week', 'time_approved', 'by_whom']
     list_display = ['week', 'end_of_week', 'person', 'approved', 'changes_required']
     search_fields = ['week', 'end_of_week', 'person']
     list_filter = ['person', 'week', 'approved']
@@ -133,3 +141,10 @@ class TimeSheetWeekAdmin(admin.ModelAdmin):
         if db_field.name == 'person':
             kwargs["queryset"] = User.objects.filter(username=request.user.username)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        if obj.approved and 'approved' in form.changed_data:
+            obj.time_approved = datetime.now()
+            if getattr(obj, 'by_whom', None) is None:
+                obj.by_whom = request.user
+        obj.save()

@@ -83,3 +83,14 @@ class ProjectArchiveIndexView(ArchiveIndexView):
     allow_future = True
     ordering = ['billing_date']
     date_list_period = 'month'
+
+
+class ProjectWIPArchiveView(ArchiveIndexView):
+    queryset = Project.objects.exclude(project_status='Closed')
+    date_field = "billing_date"
+    allow_future = True
+    ordering = ['billing_date']
+    allow_empty = True
+    template_name = 'projects/project_wip_month.html'
+
+

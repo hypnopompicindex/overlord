@@ -61,7 +61,7 @@ class Project(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='Job #')
     name = models.CharField(max_length=200, blank=True, null=True)
     project_status = models.CharField(choices=PROJECT_STATUS, max_length=200)
-#    job_number_assignment = models.PositiveIntegerField(null=True, blank=True, verbose_name='Job #')
+    job_number = models.PositiveIntegerField(default=0, verbose_name='Job #')
     product_owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='product_owner', blank=True, null=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client', blank=True, null=True)
     go_live_date = models.DateField(blank=True, null=True)
@@ -90,12 +90,19 @@ class Project(models.Model):
     falls_into_project_year = models.BooleanField(default=False)
     archive_by_year = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self):
         return self.name
 
     @property
     def total_budget(self):
         return self.production_budget + self.expenses_budget + self.hardware_purchase + self.hardware_rental
+
+    @property
+    def total_budget_2(self):
+        return self.total_budget * 40
 
     @property
     def Purchase_order(self):
@@ -122,7 +129,7 @@ class Expense(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='expense number')
     person = models.ForeignKey('people.Profile', on_delete=models.CASCADE, related_name='person_expense', blank=True, null=True)
     expense_number_assignment = models.PositiveIntegerField(null=True, blank=True)
-    cheque_processed = models.BooleanField()
+    cheque_processed = models.BooleanField(default=False)
     backup = models.FileField(upload_to='expense_backup/%Y/%m/%d', blank=True, null=True)
     date = models.DateTimeField(blank=True, null=True)
 #    date = models.DateField(blank=True, null=True)
@@ -143,6 +150,7 @@ class Receipt(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category_receipt', blank=True, null=True)
     net = models.DecimalField(default=0, decimal_places=2, max_digits=10)
     hst = models.DecimalField('HST', default=0.13, null=True, blank=True, decimal_places=2, max_digits=10)
+    fx = models.DecimalField('FX Rate', default=1.00, null=True, blank=True, decimal_places=5, max_digits=10)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_receipt', blank=True, null=True)
     expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name='expense_receipt', blank=True, null=True)
 
@@ -170,6 +178,10 @@ class PurchaseOrderReceipt(models.Model):
     rate = models.DecimalField(default=0, decimal_places=2, max_digits=10)
     hst = models.DecimalField('HST', default=0.13, null=True, blank=True, decimal_places=2, max_digits=10)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_purchase_order_receipt', blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category_purchase_receipt', blank=True, null=True)
+
+    class Meta(object):
+        ordering = ['row_number']
 
     def __str__(self):
         return str(self.description)

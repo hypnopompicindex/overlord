@@ -1,0 +1,70 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Project Month{% endblock %}
+
+{% block content %}
+    <div class="results">
+        <h1>Globacore WIP: {{ week|date:"F j, Y" }}</h1>
+
+        <table>
+            <tr>
+                <th>Previous week</th>
+                <th>Current week</th>
+                <th>Next week</th>
+            </tr>
+            <tr>
+                <td>
+                    <a href="{% url 'project:project_week' previous_week|date:"Y" previous_week|date:"W" %}">
+                         {{ previous_week|date:"F j, Y" }}{{ project_week }}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'project:project_week' week|date:"Y" week|date:"W" %}">
+                         {{ week|date:"F j, Y" }}
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'project:project_week' next_week|date:"Y" next_week|date:"W" %}">
+                        {{ next_week|date:"F j, Y" }}
+                    </a>
+                </td>
+            </tr>
+        </table>
+        <br>
+
+        <table id="result_list" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Month Hours</th>
+                    <th>Month Cost</th>
+                    <th>Total Hours</th>
+                    <th>Total Cost</th>
+                </tr>
+            </thead>
+            {% for project in object_list %}
+                <tr>
+                    <td><a href="/projects/project/{{ project.id }}/change/">{{ project.name }}</a></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+
+                </tr>
+            {% endfor %}
+        </table>
+        <p>
+        <br>
+            {% if previous_month %}Previous Month:
+                <a href="/project/pipeline/{{ previous_month|date:"Y"  }}/{{ previous_month|date:"b" }}/">
+                    {{ previous_month|date:"F Y" }}
+                </a>
+            {% endif %}
+            <br>
+            {% if next_month %}Next Month:
+                <a href="/project/pipeline/{{ next_month|date:"Y"  }}/{{ next_month|date:"b" }}/">
+                    {{ next_month|date:"F Y" }}
+                </a>
+            {% endif %}
+        </p>
+    </div>
+{% endblock %}

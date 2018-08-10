@@ -47,20 +47,20 @@ class ClientAdmin(admin.ModelAdmin):
 class ReceiptInline(admin.TabularInline):
     model = Receipt
     readonly_fields = ['receipt_number', 'total']
-    fields = ['receipt_number', 'description', 'category', 'net', 'hst', 'total', 'project']
+    fields = ['receipt_number', 'description', 'category', 'net', 'hst', 'fx', 'total', 'project']
     extra = 0
 
 
 class PurchaseOrderReceiptInline(admin.TabularInline):
     model = PurchaseOrderReceipt
     readonly_fields = ['amount', 'id']
-    fields = ['id', 'description', 'quantity', 'rate', 'hst', 'amount', 'project']
+    fields = ['id', 'description', 'category', 'quantity', 'rate', 'hst', 'amount', 'project']
     extra = 0
 
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'client', 'total_budget', 'project_status',
+    list_display = ['job_number', 'name', 'client', 'total_budget', 'project_status',
                     'estimate', 'Purchase_order', 'event_start_date', 'billing_date']
     filter_horizontal = ('team_selection',)
     list_filter = ('project_status', 'timesheets_closed', 'billing_date')
@@ -69,7 +69,7 @@ class ProjectAdmin(admin.ModelAdmin):
     inlines = [ReceiptInline, PurchaseOrderReceiptInline]
     fieldsets = (
         ('Project Information', {
-            'fields': ('name', 'id', 'client', 'project_status', 'product_owner',
+            'fields': ('name', 'job_number', 'client', 'project_status', 'product_owner',
                        'timesheets_closed', 'falls_into_project_year', 'archive_by_year')
         }),
         ('Financials', {
@@ -86,6 +86,11 @@ class ProjectAdmin(admin.ModelAdmin):
             'fields': ('team_selection',)
         }),
     )
+
+    def save_model(self, request, obj, form, change):
+        if obj.job_number == 0:
+            obj.job_number = obj.id + 1300
+        obj.save()
 
 
 @admin.register(Expense)
