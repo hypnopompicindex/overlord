@@ -80,7 +80,7 @@ class UserEditForm(ModelForm):
 class ProfileEditForm(ModelForm):
     class Meta:
         model = Profile
-        fields = ('initials', 'mobile_phone', 'office_phone', 'date_of_birth', 'address', 'biography', 'notes')
+        fields = ('mobile_phone', 'home_phone', 'date_of_birth', 'address', 'biography', 'notes')
 
 
 class HoursForm(RequestKwargModelFormMixin, ModelForm):

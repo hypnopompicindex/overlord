@@ -69,7 +69,7 @@ class Project(models.Model):
     billing_date = models.DateField(blank=True, null=True)
     permanent_installation = models.BooleanField(default=False)
     team_selection = models.ManyToManyField(Profile)
-    billable = models.BooleanField()
+    internal = models.BooleanField()
     estimate = models.BooleanField()
     production_budget = models.DecimalField(decimal_places=2, max_digits=10, default=0)
     expenses_budget = models.DecimalField(decimal_places=2, max_digits=10, default=0)
@@ -83,6 +83,7 @@ class Project(models.Model):
 #                                            related_name='project_purchase_order',
 #                                            blank=True)
     purchase_order = models.FileField(upload_to='project/purchase_order/%Y/%m/%d', blank=True, null=True)
+    purchase_order_number = models.CharField(max_length=40, blank=True, null=True)
     estimate_back_up = models.FileField(upload_to='expense_backup/%Y/%m/%d', blank=True, null=True)
     labour = models.DecimalField('Labour (Internal)', null=True, blank=True, decimal_places=2, max_digits=10)
     travel_dates = models.ManyToManyField(TravelDates, related_name='travel_dates_project', blank=True)
@@ -111,7 +112,7 @@ class Project(models.Model):
                              '<img src="/static/admin/img/icon-yes.svg" alt="True" /></a>'
                              % self.purchase_order)
         else:
-            return mark_safe('<img src="/static/admin/img/icon-no.svg" alt="True" />')
+            return mark_safe('<img src="/static/admin/img/icon-missing.png" alt="Missing" />')
 
 
 class Category(models.Model):

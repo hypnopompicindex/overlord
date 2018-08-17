@@ -70,12 +70,14 @@ class ProjectAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Project Information', {
             'fields': ('name', 'job_number', 'client', 'project_status', 'product_owner',
-                       'timesheets_closed', 'falls_into_project_year', 'archive_by_year')
+                       'timesheets_closed', 'falls_into_project_year',
+                       'archive_by_year', 'purchase_order', 'purchase_order_number',
+                       'estimate', 'estimate_back_up',)
         }),
         ('Financials', {
-            'fields': ('billable', 'production_budget', 'expenses_budget',
+            'fields': ('internal', 'production_budget', 'expenses_budget',
                        'hardware_purchase', 'hardware_rental', 'total_budget',
-                       'purchase_order', 'estimate', 'estimate_back_up', 'labour')
+                        'labour')
         }),
         ('Key Dates', {
             'fields': ('event_start_date', 'billing_date', 'permanent_installation',

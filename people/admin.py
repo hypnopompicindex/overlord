@@ -58,7 +58,7 @@ class UserProfileInline(admin.StackedInline):
 class OutOfOfficeInline(admin.StackedInline):
     model = OutOfOffice
     extra = 0
-    fields = ['start_date', 'end_date', 'person', 'leave_type', 'project', 'notes', 'approved']
+    fields = ['start_date', 'end_date', 'person', 'leave_type', 'notes', 'approved']
 
 
 class UserAdmin(AuthUserAdmin):
@@ -89,16 +89,16 @@ class ProfileAdmin(admin.ModelAdmin):
 @admin.register(OutOfOffice)
 class OutOfOfficeAdmin(admin.ModelAdmin):
     readonly_fields = ['number_of_days', 'time_approved', 'by_whom']
-    list_display = ['person', 'start_date', 'end_date', 'number_of_days',  'leave_type', 'project', 'approved']
-    fields = ['start_date', 'end_date', 'number_of_days', 'person', 'leave_type', 'project', 'notes', 'approved', 'time_approved', 'by_whom']
-    list_filter = ('person', 'start_date', 'leave_type', 'project')
-    search_fields = ['person', 'project']
+    list_display = ['person', 'start_date', 'end_date', 'number_of_days', 'submitted', 'leave_type',  'approved']
+    fields = ['start_date', 'end_date', 'number_of_days', 'person', 'submitted', 'leave_type',  'notes', 'approved', 'time_approved', 'by_whom']
+    list_filter = ('person',  'submitted', 'start_date', 'leave_type')
+    search_fields = ['person',]
 
     def get_form(self, request, obj=None, **kwargs):
         if request.user.is_superuser:
-            self.fields = ['start_date', 'end_date', 'number_of_days', 'person', 'leave_type', 'project', 'notes', 'approved', 'time_approved', 'by_whom']
+            self.fields = ['start_date', 'end_date', 'number_of_days', 'person', 'leave_type', 'notes', 'submitted', 'approved', 'time_approved', 'by_whom']
         else:
-            self.fields = ['start_date', 'end_date', 'number_of_days', 'person', 'leave_type', 'project', 'notes']
+            self.fields = ['start_date', 'end_date', 'number_of_days', 'person', 'leave_type', 'notes', 'submitted']
         form = super(OutOfOfficeAdmin,self).get_form(request, obj, **kwargs)
         return form
 
