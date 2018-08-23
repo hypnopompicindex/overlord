@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Project, Client, Category, Receipt, Expense, Supplier, PurchaseOrder, PurchaseOrderReceipt, TravelDates, User
+from .models import Project, Client, Category, Receipt, Expense, Supplier, PurchaseOrder, PurchaseOrderReceipt, TravelDates, User, Company
 from django.utils.safestring import mark_safe
 from datetime import datetime
 
@@ -32,13 +32,24 @@ def purchase_pdf(obj):
 purchase_pdf.short_description = 'PDF'
 
 
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ['company_name', 'client', 'address', 'archive']
+
+
+class CompanyInline(admin.StackedInline):
+    model = Company
+    extra = 0
+
+
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ['name', 'address', 'contact_name', 'contact_email', 'taylor_client', 'projects']
-    ordering = ['name']
+    list_display = ['contact_name', 'contact_email', 'contact_phone', 'taylor_client', 'projects']
+    ordering = ['contact_name']
 #    readonly_fields = ['projects']
-    search_fields = ['name', 'contact_name', 'contact_email']
+    search_fields = ['contact_name', 'contact_email']
     list_filter = ['taylor_client']
+    inlines = [CompanyInline]
 
     def projects(self, obj):
         return ", ".join([k.name for k in obj.client.all()])

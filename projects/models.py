@@ -27,9 +27,9 @@ PAYMENT_TYPE = (
 
 
 class Client(models.Model):
-    name = models.CharField(max_length=200, blank=True, null=True)
-    address = models.TextField(max_length=200, blank=True, null=True)
-    contact_name = models.CharField(max_length=200, blank=True, null=True)
+#    name = models.CharField(max_length=200, blank=True, null=True)
+#    address = models.TextField(max_length=200, blank=True, null=True)
+    contact_name = models.CharField(max_length=200)
     contact_email = models.EmailField(max_length=200, blank=True, null=True)
     contact_phone = models.CharField(max_length=200, blank=True, null=True)
     taylor_client = models.BooleanField(default=False)
@@ -37,7 +37,22 @@ class Client(models.Model):
     archive = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return self.contact_name
+
+
+class Company(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='company_client', blank=True, null=True)
+    company_name = models.CharField(max_length=200, blank=True, null=True)
+    address = models.TextField(max_length=200, blank=True, null=True)
+    notes = models.TextField(max_length=200, blank=True, null=True)
+    archive = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural = "Companies"
+        verbose_name = "Company"
+
+    def __str__(self):
+        return self.company_name
 
 
 class TravelDates(models.Model):
