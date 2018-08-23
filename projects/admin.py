@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Project, Client, Category, Receipt, Expense, Supplier, PurchaseOrder, PurchaseOrderReceipt, TravelDates
+from .models import Project, Client, Category, Receipt, Expense, Supplier, PurchaseOrder, PurchaseOrderReceipt, TravelDates, User
 from django.utils.safestring import mark_safe
 from datetime import datetime
 
@@ -61,7 +61,7 @@ class PurchaseOrderReceiptInline(admin.TabularInline):
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ['job_number', 'name', 'client', 'total_budget', 'project_status',
-                    'estimate', 'Purchase_order', 'event_start_date', 'billing_date']
+                    'estimate', 'Purchase_order', 'project_start', 'billing_date']
     filter_horizontal = ('team_selection',)
     list_filter = ('project_status', 'timesheets_closed', 'billing_date')
     search_fields = ['name', 'product_owner', 'client']
@@ -76,23 +76,30 @@ class ProjectAdmin(admin.ModelAdmin):
         }),
         ('Financials', {
             'fields': ('internal', 'production_budget', 'expenses_budget',
-                       'hardware_purchase', 'hardware_rental', 'total_budget',
-                        'labour')
+                       'hardware_purchase', 'hardware_rental', 'total_budget')
         }),
         ('Key Dates', {
-            'fields': ('event_start_date', 'billing_date', 'permanent_installation',
+            'fields': ('project_start', 'billing_date',
                        'testing', 'ship', 'event_load_in', 'go_live_date', 'dismantle',
                        'travel_dates')
         }),
         ('Team Members', {
             'fields': ('team_selection',)
         }),
+        ('Warranty & Support', {
+            'fields': ('permanent_installation',)
+        }),
     )
 
-    def save_model(self, request, obj, form, change):
-        if obj.job_number == 0:
-            obj.job_number = obj.id + 1300
-        obj.save()
+#    def save_model(self, request, obj, form, change):
+#        if obj.job_number == 0:
+#            obj.job_number = obj.id + 1300
+#        obj.save()
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'product_owner':
+            kwargs["queryset"] = User.objects.filter(groups__name='Product Owner')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Expense)
@@ -147,7 +154,7 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
     fields = ['requester', 'id',
               'purchase_order_request_date', 'supplier',
               'backup', 'method_of_payment', 'shipping',
-              'cheque_number', 'cheque_processed', 'date', 'by_whom']
+              'cheque_number', 'processed', 'date', 'by_whom']
     inlines = [PurchaseOrderReceiptInline]
     list_filter = ['requester', 'supplier', 'processed']
     search_fields = ['requester', 'supplier', ]
@@ -158,17 +165,17 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
             self.fields = ['id', 'requester',
                            'purchase_order_request_date', 'supplier',
                            'backup', 'method_of_payment', 'shipping',
-                           'cheque_number', 'cheque_processed', 'date', 'by_whom']
+                           'cheque_number', 'processed', 'date', 'by_whom']
         else:
             self.fields = ['requester', 'id',
                            'purchase_order_request_date', 'supplier',
                            'backup', 'method_of_payment', 'shipping',
-                           'cheque_number', 'cheque_processed', 'date', 'by_whom']
+                           'cheque_number', 'processed', 'date', 'by_whom']
         form = super(PurchaseOrderAdmin,self).get_form(request, obj, **kwargs)
         return form
 
     def save_model(self, request, obj, form, change):
-        if obj.cheque_processed and 'cheque_processed' in form.changed_data:
+        if obj.cheque_processed and 'processed' in form.changed_data:
             obj.date = datetime.now()
             if getattr(obj, 'by_whom', None) is None:
                 obj.by_whom = request.user
