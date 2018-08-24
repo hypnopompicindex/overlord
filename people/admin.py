@@ -1,9 +1,14 @@
 from django.contrib import admin
-from .models import Profile, OutOfOffice, TimeSheet, TimeSheetWeek, Hours
+from .models import Profile, OutOfOffice, TimeSheet, TimeSheetWeek, Hours, Holiday
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from projects.models import Project
 from datetime import datetime
+
+
+@admin.register(Holiday)
+class HolidayAdmin(admin.ModelAdmin):
+    list_display = ['holiday_name', 'holiday_date']
 
 
 @admin.register(TimeSheet)
@@ -89,7 +94,7 @@ class ProfileAdmin(admin.ModelAdmin):
 @admin.register(OutOfOffice)
 class OutOfOfficeAdmin(admin.ModelAdmin):
     readonly_fields = ['number_of_days', 'time_approved', 'by_whom']
-    list_display = ['person', 'start_date', 'end_date', 'number_of_days', 'submitted', 'leave_type',  'approved']
+    list_display = ['start_date', 'end_date', 'person', 'number_of_days', 'submitted', 'leave_type',  'approved']
     fields = ['start_date', 'end_date', 'number_of_days', 'person', 'submitted', 'leave_type',  'notes', 'approved', 'time_approved', 'by_whom']
     list_filter = ('person',  'submitted', 'start_date', 'leave_type')
     search_fields = ['person',]
