@@ -10,9 +10,7 @@
         <table id="result_list" style="width:100%">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>User Type</th>
-                    <th>Username</th>
+                    <th>Team Member</th>
                     <th>Out of Office - {% get_last_year %}</th>
                     <th>Out of Office - {% now "Y" %}</th>
                 </tr>
@@ -21,8 +19,6 @@
                 <tr>
 
                     <td><a href="/auth/user/{{ user.id }}/change/">{{ user.get_full_name }}</a></td>
-                    <td>{{ user.groups.all.0 }}</td>
-                    <td>{{ user.username }}</td>
                     <td><b>V:</b>{{ user.vacation_last|default_if_none:"0" }} | <b>S:</b>{{ user.sick_last|default_if_none:"0" }} | <b>LE:</b>{{ user.lieu_earned_last|default_if_none:"0" }} | <b>LT:</b>{{ user.lieu_taken_last|default_if_none:"0" }} | <b>WFH:</b>{{ user.wfh_last|default_if_none:"0" }}</td>
                     <td><b>V:</b>{{ user.vacation|default_if_none:"0" }} | <b>S:</b>{{ user.sick|default_if_none:"0" }} | <b>LE:</b>{{ user.lieu_earned|default_if_none:"0" }} | <b>LT:</b>{{ user.lieu_taken|default_if_none:"0" }} | <b>WFH:</b>{{ user.wfh|default_if_none:"0" }}</td>
                 </tr>
