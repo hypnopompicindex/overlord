@@ -93,11 +93,14 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(OutOfOffice)
 class OutOfOfficeAdmin(admin.ModelAdmin):
-    readonly_fields = ['number_of_days', 'time_approved', 'by_whom']
-    list_display = ['start_date', 'end_date', 'person', 'number_of_days', 'submitted', 'leave_type',  'approved']
-    fields = ['start_date', 'end_date', 'number_of_days', 'person', 'submitted', 'leave_type',  'notes', 'approved', 'time_approved', 'by_whom']
+    readonly_fields = ['time_approved', 'by_whom', 'name', ]
+    list_display = ['start_date', 'end_date', 'name', 'person', 'leave_type',
+                    'approved', 'number_of_days', 'submitted', 'notes']
+    fields = ['start_date', 'end_date', 'number_of_days', 'person',
+              'submitted', 'leave_type', 'notes', 'approved',
+              'time_approved', 'by_whom']
     list_filter = ('person',  'submitted', 'start_date', 'leave_type')
-    search_fields = ['person',]
+#    search_fields = ['person_id']
 
     def get_form(self, request, obj=None, **kwargs):
         if request.user.is_superuser:

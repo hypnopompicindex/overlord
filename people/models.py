@@ -46,6 +46,10 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+    @property
+    def vacation_days(self):
+        return User.objects.filter(outofoffice__leave_type__startswith="Vacation").annotate(Sum('outofoffice__number_of_days'))
+
 
 class Holiday(models.Model):
     holiday_name = models.CharField(max_length=200)
@@ -61,15 +65,15 @@ class Holiday(models.Model):
 class OutOfOffice(models.Model):
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-#    number_of_days = models.PositiveIntegerField(null=True, blank=True)
-    person = models.ForeignKey(User, on_delete=models.CASCADE, related_name='out_of_office_person', blank=True, null=True)
+    number_of_days = models.PositiveIntegerField(null=True, blank=True)
+    person = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     leave_type = models.CharField(choices=LEAVE_TYPE, max_length=200)
 #    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='out_of_office_project', blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     submitted = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
     time_approved = models.DateTimeField(blank=True, null=True)
-    by_whom = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    by_whom = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = "Out of Office"
@@ -83,12 +87,16 @@ class OutOfOffice(models.Model):
             return str(self.start_date)
 
     @property
-    def number_of_days(self):
+    def name(self):
+        return self.person.get_full_name()
+
+    def save(self, *args, **kwargs):
         holidays = [date(2018, 8, 6), date(2018, 9, 3), date(2018, 10, 8), date(2018, 12, 25), date(2018, 12, 26)]
         if self.start_date is None or self.end_date is None:
-            return 0
+            self.number_of_days = 0
         else:
-            return networkdays(self.start_date, self.end_date + timedelta(days=-1), holidays=holidays)
+            self.number_of_days = networkdays(self.start_date, self.end_date + timedelta(days=-1), holidays=holidays)
+        super(OutOfOffice, self).save(*args, **kwargs)
 
 
 class TimeSheet(models.Model):

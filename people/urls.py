@@ -41,4 +41,6 @@ urlpatterns = [
          TimeSheetWeekWeekArchiveView.as_view(),
          name="timesheet-week"),
     path('timesheet2/create/', views.HoursCreate.as_view(), name='people_create'),
+    path('ooo/', views.OutOfOfficeList.as_view(), name='ooo-list'),
+    path('profile/', views.ProfileList.as_view(), name='profile-list'),
 ]

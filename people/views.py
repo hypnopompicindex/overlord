@@ -5,11 +5,14 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
 from django.urls import reverse_lazy
 from .forms import UserRegistrationForm, UserEditForm, ProfileEditForm, TimeSheetFormSet, TimeSheetForm, HoursForm
-from .models import Profile, TimeSheet, TimeSheetWeek, Hours
+from .models import Profile, TimeSheet, TimeSheetWeek, Hours, OutOfOffice
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.db import transaction
 from django.views.generic.dates import ArchiveIndexView, WeekArchiveView
+from django.db.models import Sum, Avg, Count
+import datetime
+from django.db.models import Q
 
 
 class RequestFormKwargsMixin(object):
@@ -20,8 +23,58 @@ class RequestFormKwargsMixin(object):
         return kwargs
 
 
+class OutOfOfficeList(ListView):
+    model = OutOfOffice
+
+    def get_context_data(self, **kwargs):
+        context = super(OutOfOfficeList, self).get_context_data(**kwargs)
+        context["ooo_days_sum"] = OutOfOffice.objects.filter(person__username='tubbyink').aggregate(Sum("number_of_days"))
+        context["ooo_days_avg"] = OutOfOffice.objects.all().aggregate(Avg("number_of_days"))
+        return context
+
+
 class UserList(ListView):
     model = User
+
+    def get_context_data(self, **kwargs):
+        context = super(UserList, self).get_context_data(**kwargs)
+        today = datetime.datetime.now()
+        vacation = Sum('outofoffice__number_of_days',
+                       filter=Q(outofoffice__leave_type__startswith="vacation",
+                                outofoffice__start_date__year=today.year))
+        sick = Sum('outofoffice__number_of_days',
+                   filter=Q(outofoffice__leave_type__startswith="sick",
+                            outofoffice__start_date__year=today.year))
+        lieu_earned = Sum('outofoffice__number_of_days',
+                          filter=Q(outofoffice__leave_type__startswith="lieu_earned",
+                                   outofoffice__start_date__year=today.year))
+        lieu_taken = Sum('outofoffice__number_of_days',
+                         filter=Q(outofoffice__leave_type__startswith="lieu_taken",
+                                  outofoffice__start_date__year=today.year))
+        wfh = Sum('outofoffice__number_of_days',
+                  filter=Q(outofoffice__leave_type__startswith="wfh",
+                           outofoffice__start_date__year=today.year))
+        vacation_last = Sum('outofoffice__number_of_days',
+                            filter=Q(outofoffice__leave_type__startswith="vacation",
+                                     outofoffice__start_date__year=today.year-1))
+        sick_last = Sum('outofoffice__number_of_days',
+                        filter=Q(outofoffice__leave_type__startswith="wfh",
+                                 outofoffice__start_date__year=today.year-1))
+        lieu_earned_last = Sum('outofoffice__number_of_days',
+                               filter=Q(outofoffice__leave_type__startswith="lieu_earned",
+                                        outofoffice__start_date__year=today.year-1))
+        lieu_taken_last = Sum('outofoffice__number_of_days',
+                              filter=Q(outofoffice__leave_type__startswith="lieu_taken",
+                                       outofoffice__start_date__year=today.year-1))
+        wfh_last = Sum('outofoffice__number_of_days',
+                       filter=Q(outofoffice__leave_type__startswith="wfh",
+                                outofoffice__start_date__year=today.year-1))
+        context["object_list"] = User.objects.annotate(vacation=vacation, sick=sick, lieu_earned=lieu_earned, lieu_taken=lieu_taken, wfh=wfh, vacation_last=vacation_last, sick_last=sick_last, lieu_earned_last=lieu_earned_last, lieu_taken_last=lieu_taken_last, wfh_last=wfh_last).order_by('username')
+        return context
+
+
+class ProfileList(ListView):
+    model = Profile
 
 
 class UserCreate(CreateView):

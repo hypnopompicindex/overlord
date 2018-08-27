@@ -1,36 +1,33 @@
-{% extends "base.html" %}
+{% extends "admin/base_site.html" %}
+{% load people_tags %}
+{% block title %}People{% endblock %}
 
 {% block content %}
-    <h1>Timesheet List</h1>
 
-    {% for user in user_list %}
-        <tr>
-            <td><a href="/">{{ timesheet.week }}</a></td>
-            <td>{{ user.first_name }}</td>
-        </tr>
-    {% endfor %}
-
-    {% if timesheet_list %}
-        <table class="table">
+    <div class="results">
+        <h1>People
+        </h1>
+        <table id="result_list" style="width:100%">
             <thead>
                 <tr>
-                    <th scope="col">Week</th>
-                    <th scope="col">Hours</th>
-                    <th scope="col">Project</th>
+                    <th>Name</th>
+                    <th>User Type</th>
+                    <th>Username</th>
+                    <th>Out of Office - {% get_last_year %}</th>
+                    <th>Out of Office - {% now "Y" %}</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for timesheet in timesheet_list %}
+            {% for user in object_list %}
+                <tr>
 
-                    <tr>
-                        <td><a href="/">{{ timesheet.week }}</a></td>
-                        <td>{{ timesheet.hours }}</td>
-                        <td>{{ timesheet.project }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+                    <td><a href="/auth/user/{{ user.id }}/change/">{{ user.get_full_name }}</a></td>
+                    <td>{{ user.groups.all.0 }}</td>
+                    <td>{{ user.username }}</td>
+                    <td><b>V:</b>{{ user.vacation_last|default_if_none:"0" }} | <b>S:</b>{{ user.sick_last|default_if_none:"0" }} | <b>LE:</b>{{ user.lieu_earned_last|default_if_none:"0" }} | <b>LT:</b>{{ user.lieu_taken_last|default_if_none:"0" }} | <b>WFH:</b>{{ user.wfh_last|default_if_none:"0" }}</td>
+                    <td><b>V:</b>{{ user.vacation|default_if_none:"0" }} | <b>S:</b>{{ user.sick|default_if_none:"0" }} | <b>LE:</b>{{ user.lieu_earned|default_if_none:"0" }} | <b>LT:</b>{{ user.lieu_taken|default_if_none:"0" }} | <b>WFH:</b>{{ user.wfh|default_if_none:"0" }}</td>
+                </tr>
+            {% endfor %}
         </table>
-    {% else %}
-      <p>You have no timesheets.</p>
-    {% endif %}
+{{ object_list1.wfh }}
+    </div>
 {% endblock %}

@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Project Month{% endblock %}
+
+{% block content %}
+
+    <div class="results">
+        <h1>People
+        </h1>
+        <table id="result_list" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>User Type</th>
+                    <th>Username</th>
+                    <th>OOO - Last Year</th>
+                    <th>OOO - {% now "Y" %}</th>
+                </tr>
+            </thead>
+            {% for user in object_list %}
+                <tr>
+                    <td><a href="/projects/project/{{ project.id }}/change/">{{ user.get_full_name }}</a></td>
+                    <td>{{ user.groups.all.0 }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.total_budget }}</td>
+                    <td>{{ user.client }}</td>
+                    <td>{{ user.total_budget }}</td>
+
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
