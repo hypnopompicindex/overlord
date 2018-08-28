@@ -7,6 +7,8 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
 from ckeditor.fields import RichTextField
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 SHOW_TYPE = (
@@ -229,7 +231,6 @@ class PurchaseOrder(models.Model):
 #    supplier_address = models.TextField(blank=True)
     backup = models.FileField(upload_to='purchase_backup/%Y/%m/%d', blank=True, null=True)
     method_of_payment = models.CharField(choices=PAYMENT_TYPE, max_length=200)
-    processed = models.BooleanField(default=False)
     shipping = models.DecimalField(default=0, null=True, blank=True, decimal_places=2, max_digits=10)
 #    void = models.BooleanField(default=False)
     processed = models.BooleanField(default=False)
@@ -242,3 +243,10 @@ class PurchaseOrder(models.Model):
 
     def get_total_cost(self):
         return sum(item.amount() for item in self.purchase_order_receipt.all())
+
+
+@receiver(post_save, sender=Project, dispatch_uid="update_job_number")
+def update_job_number(sender, instance, **kwargs):
+    if not instance.job_number:
+        instance.job_number = 1300 + instance.id
+        instance.save()

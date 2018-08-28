@@ -76,17 +76,17 @@ class ProjectAdmin(admin.ModelAdmin):
     filter_horizontal = ('team_selection',)
     list_filter = ('project_status', 'timesheets_closed', 'billing_date')
     search_fields = ['name', 'product_owner', 'client']
-    readonly_fields = ['total_budget', 'id', 'Purchase_order']
+    readonly_fields = ['total_budget', 'id', 'Purchase_order', 'job_number']
     inlines = [ReceiptInline, PurchaseOrderReceiptInline]
     fieldsets = (
         ('Project Information', {
             'fields': ('name', 'job_number', 'client', 'project_status', 'product_owner',
                        'timesheets_closed', 'falls_into_project_year',
                        'archive_by_year', 'purchase_order', 'purchase_order_number',
-                       'estimate', 'estimate_back_up',)
+                       'estimate', 'estimate_back_up', 'internal')
         }),
         ('Financials', {
-            'fields': ('internal', 'production_budget', 'expenses_budget',
+            'fields': ('production_budget', 'expenses_budget',
                        'hardware_purchase', 'hardware_rental', 'total_budget')
         }),
         ('Key Dates', {
