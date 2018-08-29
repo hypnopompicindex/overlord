@@ -2,11 +2,13 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic.dates import ArchiveIndexView, MonthArchiveView
 import weasyprint
 from .models import Expense, PurchaseOrder, Project
+from django.db.models import Sum
 
 
 @staff_member_required
@@ -94,3 +96,27 @@ class ProjectWIPArchiveView(ArchiveIndexView):
     template_name = 'projects/project_wip_month.html'
 
 
+class ProjectListView(ListView):
+    model = Project
+    queryset = Project.objects.all()
+    template_name = 'projects/all.html'
+
+
+class ProjectDetailView(DetailView):
+    model = Project
+    queryset = Project.objects.all()
+    template_name = 'projects/detail.html'
+
+#    def get_context_data(self, **kwargs):
+#        data = super(ProjectDetailView, self).get_context_data(**kwargs)
+#        hours = Project.objects.filter(id=self.object.id).aggregate(hours=Sum('timesheet2__hours'))
+#        data["object_test"] = Project.objects.aggregate(hours=hours)
+#        return data
+
+    def get_object(self):
+        object = super(ProjectDetailView, self).get_object()
+        object.count = object.timesheet2.all().aggregate(Sum('hours'))['hours__sum']
+        object.production = object.count * 150
+
+        object.test = 'test'
+        return object

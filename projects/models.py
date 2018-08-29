@@ -9,6 +9,7 @@ from django.utils.safestring import mark_safe
 from ckeditor.fields import RichTextField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db.models import Sum
 
 
 SHOW_TYPE = (
@@ -131,6 +132,48 @@ class Project(models.Model):
         else:
             return mark_safe('<img src="/static/admin/img/icon-missing.png" alt="Missing" />')
 
+    @property
+    def total_hours(self):
+        try:
+            return self.timesheet2.all().aggregate(Sum('hours'))['hours__sum']
+        except:
+            return 0
+
+    @property
+    def production(self):
+        try:
+            return self.total_hours * 150
+        except:
+            return 0
+
+    @property
+    def labour(self):
+        try:
+            return self.total_hours * 40
+        except:
+            return 0
+
+    @property
+    def total_expense_receipts(self):
+        try:
+            return self.project_receipt.all().aggregate(Sum('total'))['total__sum']
+        except:
+            return 0
+
+    @property
+    def total_purchase_order_receipts(self):
+        try:
+            return self.project_purchase_order_receipt.all().aggregate(Sum('amount'))['amount__sum']
+        except:
+            return 0
+
+    @property
+    def total_expenses(self):
+        try:
+            return self.total_purchase_order_receipts + self.total_expense_receipts
+        except:
+            return 0
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
@@ -171,6 +214,7 @@ class Receipt(models.Model):
     fx = models.DecimalField('FX Rate', default=1.00, null=True, blank=True, decimal_places=5, max_digits=10)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_receipt', blank=True, null=True)
     expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name='expense_receipt', blank=True, null=True)
+    total = models.DecimalField(default=0, decimal_places=2, max_digits=10)
 
     def __str__(self):
         return 'Receipt Number {0}'.format(self.receipt_number)
@@ -179,12 +223,12 @@ class Receipt(models.Model):
         verbose_name_plural = "Expense Receipts"
         verbose_name = "Expense Receipts"
 
-    @property
-    def total(self):
-        return round(self.net * (1 + self.hst), 2)
-
     def get_cost(self):
         return round(self.net * (1 + self.hst), 2)
+
+    def save(self, *args, **kwargs):
+        self.total = round(self.net * (1 + self.hst) * self.fx, 2)
+        super(Receipt, self).save(*args, **kwargs)
 
 
 class PurchaseOrderReceipt(models.Model):
@@ -197,6 +241,7 @@ class PurchaseOrderReceipt(models.Model):
     hst = models.DecimalField('HST', default=0.13, null=True, blank=True, decimal_places=2, max_digits=10)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_purchase_order_receipt', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category_purchase_receipt', blank=True, null=True)
+    amount = models.DecimalField(default=0, decimal_places=2, max_digits=10)
 
     class Meta(object):
         ordering = ['row_number']
@@ -204,9 +249,9 @@ class PurchaseOrderReceipt(models.Model):
     def __str__(self):
         return str(self.description)
 
-    @property
-    def amount(self):
-        return round(self.quantity * self.rate * (1 + self.hst), 2)
+    def save(self, *args, **kwargs):
+        self.amount = round(self.quantity * self.rate * (1 + self.hst), 2)
+        super(PurchaseOrderReceipt, self).save(*args, **kwargs)
 
 
 class Supplier(models.Model):

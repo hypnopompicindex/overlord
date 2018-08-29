@@ -1,4 +1,5 @@
 {% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
 
 {% block extrastyle %}
 {% endblock %}
@@ -32,17 +33,20 @@
             </thead>
             {% for project in object_list %}
                 <tr>
-                    <td><a href="/projects/project/{{ project.id }}/change/">{{ project.name }}</a></td>
-                    <td>{{ project.id }}</td>
-                    <td>{{ project.id }}</td>
-                    <td>{{ project.id }}</td>
-                    <td>{{ project.id }}</td>
-                    <td>{{ project.id }}</td>
-
+                    <td><a href="/project/{{ project.id }}/change/">{{ project.job_number }}</a></td>
+                    <td>{{ project.name }}</td>
+                    <td>{{ project.client }}</td>
+                    <td>${{ project.total_budget }}</td>
+                    <td>{{ project.project_status }}</td>
+                    <td>{{ project.estimate }}</td>
+                    <td>{{ project.Purchase_order }}</td>
+                    <td>{{ project.project_start }}</td>
+                    <td>{{ project.billing_date }}</td>
                 </tr>
             {% endfor %}
         </table>
     </div>
-
-
+    {% if user.groups.all.0 == 'Systems Admin' %}
+              {% admin_actions %}
+    {% endif %}
 {% endblock %}

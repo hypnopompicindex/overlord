@@ -1,0 +1,77 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrastyle %}
+{% endblock %}
+
+{% block extrahead %}
+{% endblock %}
+
+{% block title %}Projects{% endblock %}
+
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
+
+
+{% block content %}
+    <div class="results">
+        <h1>Projects - {{ object.name }}
+        </h1>
+        <h2>Project Information</h2>
+            <p><label>Name:</label>{{ object.id }}</p>
+            <p><label>Job Number:</label>{{ object.job_number }}
+            <p><label>Client:</label>{{ object.client }}
+            <p><label>Project Status:</label>{{ object.project_status }}
+            <p><label>Product Owner:</label>{{ object.product_owner }}
+            <p><label>Timesheets Closed:</label>{{ object.timesheets_closed }}
+            <p><label>Falls into Project Year:</label>{{ object.falls_into_project_year }}
+            <p><label>Archive by Year:</label>{{ object.archive_by_year }}
+            <p><label>Purchase Order:</label>{{ object.purchase_order }}
+            <p><label>Purchase Order Number:</label>{{ purchase_order_number.name }}
+            <p><label>Estimate Back Up:</label><span>{{ estimate.estimate_back_up }}
+            <p><label>Internal:</label>{{ object.internal }}
+        <h2>Financials</h2>
+        <p>
+            <p><label>Production Budget:</label>{{ object.production_budget }}</p>
+            <p><label>Expenses Budget:</label>{{ object.expenses_budget }}</p>
+            <p><label>Hardware Purchase:</label>{{ object.hardware_purchase }}</p>
+            <p><label>Hardware Rental:</label>{{ object.hardware_rental }}</p>
+            <p><label>Total Budget:</label>{{ object.total_budget }}</p>
+            <p><label>Hours:</label>{{ object.count }}</p>
+            <p><label>Production:</label>{{ object.production }}</p>
+        <h2>Key Dates</h2>
+            <p><label>Project Start:</label>{{ object.project_start }}</p>
+            <p><label>Billing Date:</label>{{ object.billing_date }}</p>
+            <p><label>Testing:</label>{{ object.testing }}</p>
+            <p><label>Ship:</label>{{ object.ship }}</p>
+            <p><label>Event Load_in:</label>{{ object.event_load_in }}</p>
+        <h2>Team Members</h2>
+            <p><label>Team Selection:</label>{{ object.team_selection }}</p>
+        <h2>Project Information</h2>
+            <p><label>Warranty & Support:</label>{{ object.permanent_installation }}</p>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+    {% if user.groups.all.0 == 'Systems Admin' %}
+              {% admin_actions %}
+    {% endif %}
+{% endblock %}

@@ -16,4 +16,6 @@ urlpatterns = [
     path('wip/<int:year>/<str:month>/', ProjectWIPArchiveView.as_view(), name="project_month"),
     path('pipeline/<int:year>/<str:month>/', ProjectMonthArchiveView.as_view(), name="project_month"),
     path('pipeline/', ProjectArchiveIndexView.as_view(), name="pipeline"),
+    path('all/', views.ProjectListView.as_view(), name='booked'),
+    path('<pk>/', views.ProjectDetailView.as_view(), name='project-detail'),
 ]
